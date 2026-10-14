@@ -70,7 +70,7 @@ footer{margin-top:40px;font-size:12px;color:var(--muted);border-top:1px solid va
 
 <div class="note draft" id="draftNote" hidden><span id="draftMsg">前回の相談が途中で残っています。</span><button type="button" class="btn ghost" id="draftGo">続きから</button><button type="button" class="btn ghost" id="draftNew" style="margin-left:0">新しく始める</button></div>
 <div class="note" id="lastNote" hidden><span>前回のアドバイスが残っています。</span><button type="button" class="btn ghost" id="lastBtn">前回のアドバイスを見る</button></div>
-<div class="note" id="exampleNote"><span>例として入力してあります。あなたの内容に書き換えてお使いください。</span><button type="button" class="btn ghost" id="clearBtn">入力を消す</button></div>
+<div class="note" id="exampleNote"><span id="exMsg">書き込み欄の薄い字は記入例です。入力すると消えます。</span><button type="button" class="btn ghost" id="exBtn">記入例をまとめて入れてみる</button><button type="button" class="btn ghost" id="clearBtn" hidden style="margin-left:0">入力を消す</button></div>
 
 <form id="f" novalidate>
   <fieldset><legend>迎えたい動物</legend><div class="opts" data-name="animal" data-type="radio">
@@ -112,7 +112,7 @@ footer{margin-top:40px;font-size:12px;color:var(--muted);border-top:1px solid va
   <fieldset><legend>これからの予定<small>複数選べます</small></legend><div class="opts" data-name="future" data-type="checkbox">
     <span>転勤</span><span>引っ越し・住み替え</span><span>結婚</span><span>妊娠・出産</span><span>子どもの独立</span><span>介護</span><span>特にない</span></div></fieldset>
   <fieldset><legend><label for="free">相談したいこと</label></legend>
-    <textarea id="free" placeholder="気になっていること、迷っていることを自由に"></textarea></fieldset>
+    <textarea id="free" placeholder="気になっていること、迷っていることを自由に（例: 本当は大型犬に憧れていますが、マンションの決まりで小型犬しか飼えません。どんな犬が合いますか？）"></textarea></fieldset>
   <div class="actions"><button class="btn" id="go" type="submit">アドバイスを受け取る</button><span class="err" id="formErr" role="status"></span></div>
   <div class="savebar"><button class="btn ghost" id="saveForm" type="button">💾 ここまで保存する</button><span class="saveStat" role="status">書いた内容は自動でも保存されます。閉じても、次に開いたときに続きから書けます。</span></div>
 </form>
@@ -187,8 +187,10 @@ footer{margin-top:40px;font-size:12px;color:var(--muted);border-top:1px solid va
     ['breed','familyNote','rule','daytimeNote','petsNote','free'].forEach(function(id){ document.getElementById(id).value=o[id]||''; });
     renderBreeds(o.animal||'', o.breedPick||''); if(o.breedPick==='その他'){breedText.hidden=false;}
     document.getElementById('expWrap').hidden=!(o.exp&&o.exp!=='ない'); }
-  fill(EXAMPLE);
-  document.getElementById('clearBtn').onclick=function(){ fill({}); document.getElementById('exampleNote').hidden=true; };
+  fill({});
+  document.getElementById('clearBtn').onclick=function(){ fill({}); exMode(false); if(stage==='form') saveDraft(); };
+  function exMode(on){ document.getElementById('exMsg').textContent= on ? '記入例が入っています。あなたの内容に書き換えるか、「入力を消す」で空にしてください。' : '書き込み欄の薄い字は記入例です。入力すると消えます。'; document.getElementById('exBtn').hidden=on; document.getElementById('clearBtn').hidden=!on; document.getElementById('exampleNote').hidden=false; }
+  document.getElementById('exBtn').onclick=function(){ fill(EXAMPLE); exMode(true); };
   var last=null; try{ last=JSON.parse(localStorage.getItem('shippo_last')||'null'); }catch(e){ last=null; }
   if(last&&last.answer){ document.getElementById('lastNote').hidden=false; }
   // ---- 途中保存（この端末のブラウザだけ） ----
@@ -245,6 +247,7 @@ footer{margin-top:40px;font-size:12px;color:var(--muted);border-top:1px solid va
     +'- 希望の動物で条件が合わないところがあっても、条件を重ねただけで不向きとしない。まず、その動物のまま実現するために何が必要か（準備、迎える時期、支援）を示す。それでも難しい場合は、同じ動物の中で別の品種・迎え方を考える。別の動物は、その動物そのものが暮らしと合わない場合にだけ、可能性として示す。\n'
     +'- 同じことを二度書かない。一つの話題は一つの段落で言い切り、最後の段落で前の内容をくり返してまとめない。相談票や追加の質問の答え（「〜とのことで」）は、結論に関わる時だけ短く触れ、全部を言い直さない。「安心です」「心強いです」など同じ結びの言葉は、一つの回答で2回までにして、言い方を変える。\n'
     +'- 追加の質問で答えがなかったものは、相談者が何か答えたように書かない（「〜は分からないとのこと」など）。触れる場合は「もし〜なら」「〜という方法もあります」の形で書く。\n'
+    +'- 相談票で（未回答）の項目は、相談者が「まだ決めていない」と答えたものとして書かない。触れる場合は「まだ伺っていませんが」のように書く。\n'
     +'- わざわざ扱わないことを断る一文（例:「ほかの動物のことは、ここでは触れません」）は書かない。\n'
     +'- 先住の動物がいる相談では、迎える場合の助け（データにある、先住の子を優先する、最初は部屋を分けて少しずつ慣らす、など）も短く添える。\n\n'
     +'# 相談者の回答（相談票）\n'+p+'\n\n# 判断原理（07）\n'+KB07+'\n\n# データ（00 横断比較表）\n'+KB00;
@@ -292,7 +295,7 @@ footer{margin-top:40px;font-size:12px;color:var(--muted);border-top:1px solid va
   var qaAll='', round=0;
   async function askFollow(max){
     var sample=await samplePromise; if(!sample) return [];
-    var prompt=base+(qaAll?'\n\n# これまでの追加の質問と答え\n'+qaAll:'')+'\n\n相談票'+(qaAll?'とこれまでの答え':'')+'を読み、アドバイスを決めるのに欠かせない情報がまだ足りなければ、相談者への追加の質問を作ってください。ふだんは3つまで、どうしても必要な場合だけ最大'+max+'つまで。相談票やこれまでの答えで分かることは聞かない。質問どうしで同じことを聞かない（似た内容は一つにまとめる）。結論を変えうる情報を優先する（例: 迎えた直後に家にいられるか、世話が難しくなったときに頼れる人や預け先、毎日の散歩などの体力、飼っていた動物の経験の中身）。足りていれば空の配列にする。やわらかい、やさしい日本語の短い質問で。JSONだけで答える: {"questions":["…"]}';
+    var prompt=base+(qaAll?'\n\n# これまでの追加の質問と答え\n'+qaAll:'')+'\n\n相談票'+(qaAll?'とこれまでの答え':'')+'を読み、アドバイスを決めるのに欠かせない情報がまだ足りなければ、相談者への追加の質問を作ってください。ふだんは3つまで、どうしても必要な場合だけ最大'+max+'つまで。相談票やこれまでの答えで分かることは聞かない。質問どうしで同じことを聞かない（似た内容は一つにまとめる）。相談票の中に、結論に関わる食い違い（例: 一緒に暮らす人と補足、住まいと飼える動物の決まり、すでに飼っている動物と決まり）があれば、それを確かめる質問を優先する。結論を変えうる情報を優先する（例: 迎えた直後に家にいられるか、世話が難しくなったときに頼れる人や預け先、毎日の散歩などの体力、飼っていた動物の経験の中身）。足りていれば空の配列にする。やわらかい、やさしい日本語の短い質問で。JSONだけで答える: {"questions":["…"]}';
     try{ var r=await sample.json(prompt,{modelTier:'quick',cache:false}); return (r&&Array.isArray(r.questions)?r.questions:[]).map(String).filter(Boolean).slice(0,max); }catch(e){ return []; }
   }
   function showFollow(list){
@@ -326,11 +329,11 @@ footer{margin-top:40px;font-size:12px;color:var(--muted);border-top:1px solid va
     try{ navigator.clipboard.writeText(t).then(function(){m.textContent='コピーしました。';},function(){sel();}); }catch(e){ sel(); }
     function sel(){ var r=document.createRange(); r.selectNodeContents(out); var g=getSelection(); g.removeAllRanges(); g.addRange(r); m.textContent='文章を選択しました。コピーしてお使いください。'; } };
   document.getElementById('saveBtn').onclick=async function(){ var m=document.getElementById('afterMsg'); var b=this; b.disabled=true;
-    try{ var db=await dbPromise; if(!db||!current) throw 0; await db.collection('records').add({at:new Date().toISOString(),profile:current.profile,followup:current.followup||'',answer:current.answer});
+    try{ var db=await dbPromise; var u=await userP; var uid=u?await u.id():null; if(!db||!current||!uid) throw 0; var at=new Date().toISOString(); await db.doc('records/'+uid).collection('items').add({at:at,profile:current.profile,followup:current.followup||'',answer:current.answer}); await db.doc('records/'+uid).set({last:at});
       m.textContent='記録に残しました。'; b.hidden=true; }
-    catch(e){ m.textContent='記録に残せませんでした（記録できるのは、このページの持ち主だけです）。'; b.disabled=false; } };
+    catch(e){ m.textContent='記録に残せませんでした。少し時間をおいて、もう一度お試しください。'; b.disabled=false; } };
   document.getElementById('again').onclick=function(){ stage='form'; show(null); document.getElementById('f').scrollIntoView({behavior:'smooth'}); };
-  document.getElementById('restart').onclick=function(){ fill({}); qaAll=''; round=0; stage='form'; clearDraft(); show(null); document.getElementById('exampleNote').hidden=true; window.scrollTo({top:0,behavior:'smooth'}); };
+  document.getElementById('restart').onclick=function(){ fill({}); qaAll=''; round=0; stage='form'; clearDraft(); show(null); exMode(false); window.scrollTo({top:0,behavior:'smooth'}); };
   document.getElementById('fuList').addEventListener('input',function(){ saveDraft(); });
   document.getElementById('saveFu').onclick=function(){ saveDraft(true); };
   document.getElementById('draftNew').onclick=function(){ clearDraft(); document.getElementById('draftNote').hidden=true; };
