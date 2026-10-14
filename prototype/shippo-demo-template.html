@@ -27,6 +27,9 @@ header{display:flex;align-items:center;justify-content:space-between;gap:12px;pa
 h2{font-family:var(--display);font-weight:700;font-size:19px;margin:0 0 4px;text-wrap:balance}
 .note{display:flex;gap:10px;align-items:center;flex-wrap:wrap;font-size:13px;color:var(--muted);background:var(--accent-soft);border-radius:10px;padding:8px 12px;margin-bottom:16px}
 .note button{margin-left:auto}
+.savebar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:10px;font-size:13px;color:var(--muted)}
+.draft{background:#fff4d6;color:#5a4300;font-size:14px;border:1px solid #f0d58a}
+@media (prefers-color-scheme: dark){.draft{background:#3a3115;color:#f3e2b0;border-color:#6b5a26}}
 form{display:grid;gap:22px}
 fieldset{border:0;margin:0;padding:0;display:grid;gap:8px;min-width:0}
 legend{font-weight:700;font-size:15px;padding:0;margin-bottom:6px}
@@ -65,7 +68,7 @@ footer{margin-top:40px;font-size:12px;color:var(--muted);border-top:1px solid va
 </header>
 <p class="lead">迎えたい動物と、いまの暮らしを教えてください。必要なら、こちらからいくつか確認の質問をします。そのうえで、獣医師の経験をもとにした考え方で、あなたの暮らしに合う迎え方をアドバイスします。</p>
 
-<div class="note" id="draftNote" hidden><span id="draftMsg">前回の相談が途中で残っています。</span><button type="button" class="btn ghost" id="draftGo">続きから</button><button type="button" class="btn ghost" id="draftNew" style="margin-left:0">新しく始める</button></div>
+<div class="note draft" id="draftNote" hidden><span id="draftMsg">前回の相談が途中で残っています。</span><button type="button" class="btn ghost" id="draftGo">続きから</button><button type="button" class="btn ghost" id="draftNew" style="margin-left:0">新しく始める</button></div>
 <div class="note" id="lastNote" hidden><span>前回のアドバイスが残っています。</span><button type="button" class="btn ghost" id="lastBtn">前回のアドバイスを見る</button></div>
 <div class="note" id="exampleNote"><span>例として入力してあります。あなたの内容に書き換えてお使いください。</span><button type="button" class="btn ghost" id="clearBtn">入力を消す</button></div>
 
@@ -111,6 +114,7 @@ footer{margin-top:40px;font-size:12px;color:var(--muted);border-top:1px solid va
   <fieldset><legend><label for="free">相談したいこと</label></legend>
     <textarea id="free" placeholder="気になっていること、迷っていることを自由に"></textarea></fieldset>
   <div class="actions"><button class="btn" id="go" type="submit">アドバイスを受け取る</button><span class="err" id="formErr" role="status"></span></div>
+  <div class="savebar"><button class="btn ghost" id="saveForm" type="button">💾 ここまで保存する</button><span class="saveStat" role="status">書いた内容は自動でも保存されます。閉じても、次に開いたときに続きから書けます。</span></div>
 </form>
 
 <section id="followup" hidden aria-live="polite">
@@ -118,6 +122,7 @@ footer{margin-top:40px;font-size:12px;color:var(--muted);border-top:1px solid va
   <p class="lead" id="fuLead">アドバイスの前に、いくつか確認させてください。分からないものは空欄のままで大丈夫です。</p>
   <div id="fuList" class="fu"></div>
   <div class="actions"><button class="btn" id="fuGo" type="button">答えてアドバイスを受け取る</button></div>
+  <div class="savebar"><button class="btn ghost" id="saveFu" type="button">💾 ここまで保存する</button><span class="saveStat" role="status">答えは自動でも保存されます。</span></div>
 </section>
 
 <section id="answer" hidden aria-live="polite">
@@ -127,6 +132,7 @@ footer{margin-top:40px;font-size:12px;color:var(--muted);border-top:1px solid va
   <p class="err" id="shopNote" hidden>試作版のため、お店の案内はまだつながっていません。</p>
   <div class="actions" id="after" hidden>
     <button class="btn ghost" id="copyBtn" type="button">アドバイスをコピー</button>
+    <button class="btn ghost" id="copyAllBtn" type="button" hidden>相談票・質問・アドバイスをまとめてコピー</button>
     <button class="btn ghost" id="saveBtn" type="button" hidden>この相談を記録に残す（検証用）</button>
     <button class="btn ghost" id="again" type="button">相談票を書き直す</button>
     <button class="btn ghost" id="restart" type="button">最初からやり直す</button>
@@ -134,7 +140,7 @@ footer{margin-top:40px;font-size:12px;color:var(--muted);border-top:1px solid va
   <p class="lead" id="afterMsg" role="status"></p>
 </section>
 
-<footer>しっぽ帳は、動物を迎えるかどうかを決めるものではなく、考えるためのアドバイスです。最終的な判断はご家族で、また健康のことはかかりつけの獣医師にご相談ください。<br>試作版: 回答はAIが作成します。直前のアドバイスは、この端末のブラウザにだけ残ります。「記録に残す」を押した場合だけ、相談票とアドバイスが検証用に保存されます。</footer>
+<footer>しっぽ帳は、動物を迎えるかどうかを決めるものではなく、考えるためのアドバイスです。最終的な判断はご家族で、また健康のことはかかりつけの獣医師にご相談ください。<br>試作版: 回答はAIが作成します。書きかけの相談票と直前のアドバイスは、あなた専用の場所に保存され、次に開いたときに続きから使えます（ほかの人には見えません）。「記録に残す」を押した場合だけ、相談票とアドバイスが検証用に保存されます。</footer>
 </div>
 
 <script type="text/plain" id="kb07">__KB07__</script>
@@ -191,14 +197,28 @@ footer{margin-top:40px;font-size:12px;color:var(--muted);border-top:1px solid va
       o[k]=(ins[0]&&ins[0].type==='checkbox')? v : (v[0]||''); });
     TEXTS.forEach(function(id){ o[id]=document.getElementById(id).value; }); return o; }
   var stage='form';
-  function saveDraft(){ try{ var fu=[]; if(stage==='followup'){ fu=qs.map(function(q,i){ var t=document.getElementById('fu'+i); return t?t.value:''; }); }
-      localStorage.setItem('shippo_draft',JSON.stringify({stage:stage,form:snap(),qaAll:qaAll,round:round,qs:qs,fu:fu,at:Date.now()})); }catch(e){} }
-  function clearDraft(){ try{ localStorage.removeItem('shippo_draft'); }catch(e){} }
+  var userP=(window.claude&&window.claude.use)?window.claude.use('user').catch(function(){return null;}):Promise.resolve(null);
+  var myDocP=Promise.all([dbP0(),userP]).then(function(a){ var db=a[0],u=a[1]; if(!db||!u) return null; return u.id().then(function(id){ return id? function(k){return db.doc('data/users/'+id+'/'+k);} : null; }); }).catch(function(){return null;});
+  function dbP0(){ return (window.claude&&window.claude.use)?window.claude.use('db').catch(function(){return null;}):Promise.resolve(null); }
+  function hhmm(t){ var d=new Date(t); return (d.getMonth()+1)+'/'+d.getDate()+' '+d.getHours()+':'+String(d.getMinutes()).padStart(2,'0'); }
+  function stat(t){ document.querySelectorAll('.saveStat').forEach(function(e){ e.textContent=t; }); }
+  var saveTimer=null;
+  function draftObj(){ var fu=[]; if(stage==='followup'){ fu=qs.map(function(q,i){ var t=document.getElementById('fu'+i); return t?t.value:''; }); }
+    return {stage:stage,form:snap(),qaAll:qaAll,round:round,qs:qs,fu:fu,partial:(stage==='advising'?out.textContent:''),at:Date.now()}; }
+  function saveDraft(now){ var d=draftObj(); try{ localStorage.setItem('shippo_draft',JSON.stringify(d)); }catch(e){}
+    clearTimeout(saveTimer); saveTimer=setTimeout(function(){ myDocP.then(function(doc){ if(!doc) return false; return doc('draft').set({json:JSON.stringify(d)}).then(function(){return true;}); }).then(function(ok){ stat((ok?'保存しました（':'この端末に保存しました（')+hhmm(d.at)+'）'); },function(){ stat('この端末に保存しました（'+hhmm(d.at)+'）'); }); }, now?0:1500);
+    if(now) stat('保存しています…'); }
+  function clearDraft(){ try{ localStorage.removeItem('shippo_draft'); }catch(e){} myDocP.then(function(doc){ if(doc) return doc('draft').delete(); }).catch(function(){}); }
   var draft=null; try{ draft=JSON.parse(localStorage.getItem('shippo_draft')||'null'); }catch(e){ draft=null; }
-  if(draft&&draft.form){ document.getElementById('draftNote').hidden=false;
-    document.getElementById('draftMsg').textContent= draft.stage==='followup' ? '前回の相談が、追加の質問のところで止まっています。' : draft.stage==='advising' ? '前回の相談が、アドバイスを作っている途中で止まっています。' : '前回の相談票が、書きかけで残っています。'; }
+  function showDraft(){ if(!(draft&&draft.form)) return; document.getElementById('draftNote').hidden=false;
+    var w= draft.stage==='followup' ? '追加の質問のところ' : draft.stage==='advising' ? 'アドバイスを作っている途中' : '相談票を書いている途中';
+    document.getElementById('draftMsg').textContent='📝 書きかけの相談があります（'+w+'。'+hhmm(draft.at)+' に保存）。'; }
+  showDraft();
+  myDocP.then(function(doc){ if(!doc) return null; return doc('draft').get(); }).then(function(sn){ if(!sn||!sn.exists) return; var d=null; try{ d=JSON.parse(sn.data().json); }catch(e){} if(d&&d.form&&(!draft||d.at>draft.at)){ draft=d; showDraft(); } }).catch(function(){});
+  myDocP.then(function(doc){ if(!doc) return null; return doc('last').get(); }).then(function(sn){ if(!sn||!sn.exists) return; var r=null; try{ r=JSON.parse(sn.data().json); }catch(e){} if(r&&r.answer&&(!last||r.at>last.at)){ last=r; document.getElementById('lastNote').hidden=false; } }).catch(function(){});
   document.getElementById('f').addEventListener('input',function(){ if(stage==='form') saveDraft(); });
   document.getElementById('f').addEventListener('change',function(){ if(stage==='form') saveDraft(); });
+  document.getElementById('saveForm').onclick=function(){ saveDraft(true); };
 
   function get(name){ var a=Array.from(document.querySelectorAll('input[name="'+name+'"]:checked')).map(function(i){return i.value}); return a.join('、')||'（未回答）'; }
   function profile(){
@@ -223,7 +243,8 @@ footer{margin-top:40px;font-size:12px;color:var(--muted);border-top:1px solid va
     +'- 書く前に心の中で、意向の型（決まり具合と思いの強さ）と、重み3の条件の照合を行い、その結果に沿って結論を決める（この過程は書かない）。\n'
     +'- 最初の段落で、相談の問いに答える。ただし最初の一文で「無理」「できません」「お勧めしにくい」と言い切らない。まず相談者の希望や気持ちを受け止め、そのうえで条件との関係を伝え、合わない場合も次の道とあわせて伝える。\n'
     +'- 希望の動物で条件が合わないところがあっても、条件を重ねただけで不向きとしない。まず、その動物のまま実現するために何が必要か（準備、迎える時期、支援）を示す。それでも難しい場合は、同じ動物の中で別の品種・迎え方を考える。別の動物は、その動物そのものが暮らしと合わない場合にだけ、可能性として示す。\n'
-    +'- 同じことを二度書かない。一つの話題は一つの段落で言い切り、最後の段落で前の内容をくり返してまとめない。相談票や追加の質問の答え（「〜とのことで」）は、結論に関わる時だけ短く触れ、全部を言い直さない。「安心です」など同じ結びの言葉を何度も使わず、言い方を変える。\n'
+    +'- 同じことを二度書かない。一つの話題は一つの段落で言い切り、最後の段落で前の内容をくり返してまとめない。相談票や追加の質問の答え（「〜とのことで」）は、結論に関わる時だけ短く触れ、全部を言い直さない。「安心です」「心強いです」など同じ結びの言葉は、一つの回答で2回までにして、言い方を変える。\n'
+    +'- 追加の質問で答えがなかったものは、相談者が何か答えたように書かない（「〜は分からないとのこと」など）。触れる場合は「もし〜なら」「〜という方法もあります」の形で書く。\n'
     +'- わざわざ扱わないことを断る一文（例:「ほかの動物のことは、ここでは触れません」）は書かない。\n'
     +'- 先住の動物がいる相談では、迎える場合の助け（データにある、先住の子を優先する、最初は部屋を分けて少しずつ慣らす、など）も短く添える。\n\n'
     +'# 相談者の回答（相談票）\n'+p+'\n\n# 判断原理（07）\n'+KB07+'\n\n# データ（00 横断比較表）\n'+KB00;
@@ -246,7 +267,7 @@ footer{margin-top:40px;font-size:12px;color:var(--muted);border-top:1px solid va
     out.classList.remove('err'); out.classList.add('thinking'); out.textContent='考えています…（30秒〜1分ほどかかります）';
     try{
       var prof=profile(); var r=await sample(base+(extra?'\n\n# 追加の質問への答え\n'+extra:'')+'\n\n上の相談票に対して、相談者へのアドバイスを書いてください。',
-        {onText:function(u){out.classList.remove('thinking');out.textContent=u.text;}});
+        {onText:function(u){out.classList.remove('thinking');out.textContent=u.text; try{ var d=draftObj(); localStorage.setItem('shippo_draft',JSON.stringify(d)); }catch(e){} }});
       document.getElementById('shop').hidden=false;
       afterDone({profile:prof,followup:extra||'',answer:r.text,at:new Date().toISOString()}); stage='done'; clearDraft();
     }catch(e){ out.classList.remove('thinking'); out.textContent=e.text||''; if(e.code!=='cancelled'){ var p=document.createElement('p'); p.className='err'; p.textContent=msg(e.code); out.append(document.createElement('br'),p);} }
@@ -290,13 +311,17 @@ footer{margin-top:40px;font-size:12px;color:var(--muted);border-top:1px solid va
     b.disabled=false; advise(qaAll);
   };
   var current=null;
-  function afterDone(rec){ current=rec; document.getElementById('after').hidden=false; document.getElementById('copyBtn').hidden=false; document.getElementById('afterMsg').textContent='';
+  function afterDone(rec){ current=rec; document.getElementById('after').hidden=false; document.getElementById('copyBtn').hidden=false; document.getElementById('copyAllBtn').hidden=false; document.getElementById('afterMsg').textContent='';
     try{ localStorage.setItem('shippo_last',JSON.stringify(rec)); }catch(e){}
+    last=rec; myDocP.then(function(doc){ if(doc) return doc('last').set({json:JSON.stringify(rec)}); }).catch(function(){});
     dbPromise.then(function(db){ document.getElementById('saveBtn').hidden=!db; }); }
   document.getElementById('lastBtn').onclick=function(){ if(!last) return; show('answer'); out.classList.remove('thinking','err'); out.textContent=last.answer;
-    current=last; document.getElementById('after').hidden=false; document.getElementById('copyBtn').hidden=false; document.getElementById('shop').hidden=false;
+    current=last; document.getElementById('after').hidden=false; document.getElementById('copyBtn').hidden=false; document.getElementById('copyAllBtn').hidden=false; document.getElementById('shop').hidden=false;
     dbPromise.then(function(db){ document.getElementById('saveBtn').hidden=!db; });
     document.getElementById('answer').scrollIntoView({behavior:'smooth',block:'start'}); };
+  document.getElementById('copyAllBtn').onclick=function(){ var m=document.getElementById('afterMsg'); if(!current) return;
+    var t='# 相談票\n'+current.profile+'\n\n# 追加の質問と答え\n'+(current.followup||'（なし）')+'\n\n# アドバイス\n'+current.answer;
+    try{ navigator.clipboard.writeText(t).then(function(){m.textContent='相談票・質問・アドバイスをまとめてコピーしました。';},function(){m.textContent='コピーできませんでした。';}); }catch(e){ m.textContent='コピーできませんでした。'; } };
   document.getElementById('copyBtn').onclick=function(){ var m=document.getElementById('afterMsg'); var t=out.textContent;
     try{ navigator.clipboard.writeText(t).then(function(){m.textContent='コピーしました。';},function(){sel();}); }catch(e){ sel(); }
     function sel(){ var r=document.createRange(); r.selectNodeContents(out); var g=getSelection(); g.removeAllRanges(); g.addRange(r); m.textContent='文章を選択しました。コピーしてお使いください。'; } };
@@ -307,6 +332,7 @@ footer{margin-top:40px;font-size:12px;color:var(--muted);border-top:1px solid va
   document.getElementById('again').onclick=function(){ stage='form'; show(null); document.getElementById('f').scrollIntoView({behavior:'smooth'}); };
   document.getElementById('restart').onclick=function(){ fill({}); qaAll=''; round=0; stage='form'; clearDraft(); show(null); document.getElementById('exampleNote').hidden=true; window.scrollTo({top:0,behavior:'smooth'}); };
   document.getElementById('fuList').addEventListener('input',function(){ saveDraft(); });
+  document.getElementById('saveFu').onclick=function(){ saveDraft(true); };
   document.getElementById('draftNew').onclick=function(){ clearDraft(); document.getElementById('draftNote').hidden=true; };
   document.getElementById('draftGo').onclick=function(){ var d=draft; document.getElementById('draftNote').hidden=true; document.getElementById('exampleNote').hidden=true; if(!d) return;
     fill(d.form); qaAll=d.qaAll||''; round=d.round||0; base=rules(profile());
