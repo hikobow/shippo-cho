@@ -85,7 +85,11 @@ footer{margin-top:40px;font-size:12px;color:var(--muted);border-top:1px solid va
     <input type="text" id="rule" placeholder="飼える動物の決まり（例: 小型犬1匹まで）">
   </fieldset>
   <fieldset><legend>平日、家に誰もいない時間</legend><div class="opts" data-name="away" data-type="radio">
-    <span>ほとんど誰かがいる</span><span>6時間くらいまで</span><span>6〜10時間</span><span>10時間以上</span></div></fieldset>
+    <span>ほとんど誰かが家にいる</span><span>6時間以内</span><span>6時間超〜10時間以内</span><span>10時間超</span></div></fieldset>
+  <fieldset><legend>いま一緒に暮らしている動物</legend><div class="opts" data-name="pets" data-type="radio">
+    <span>いない</span><span>いる</span></div>
+    <input type="text" id="petsNote" placeholder="いる場合は、種類・年齢・頭数（例: 11歳の猫1匹）">
+  </fieldset>
   <fieldset><legend>泊まりがけの外出（旅行・出張など）</legend><div class="opts" data-name="trip" data-type="radio">
     <span>ほとんどない</span><span>年に数回</span><span>月に1回以上</span></div></fieldset>
   <fieldset><legend>動物を飼った経験</legend><div class="opts" data-name="exp" data-type="radio">
@@ -138,12 +142,12 @@ footer{margin-top:40px;font-size:12px;color:var(--muted);border-top:1px solid va
       box.replaceChild(inp,sp); box.insertBefore(lab,inp.nextSibling);
     });
   });
-  var EXAMPLE={animal:'犬',wish:'できればこの動物がいい',age:'40代',family:['配偶者・パートナー','子ども'],home:'マンション（持ち家）',away:'6時間くらいまで',trip:'年に数回',exp:'ない',allergy:'ない',future:['子どもの独立'],
+  var EXAMPLE={animal:'犬',wish:'できればこの動物がいい',age:'40代',family:['配偶者・パートナー','子ども'],home:'マンション（持ち家）',away:'6時間以内',pets:'いない',trip:'年に数回',exp:'ない',allergy:'ない',future:['子どもの独立'],
     breed:'', familyNote:'中学1年の娘', rule:'小型犬1匹まで', free:'本当は大型犬に憧れていますが、マンションの決まりで小型犬しか飼えません。家族で散歩やお出かけを楽しみたいです。どんな犬が合いますか？'};
   function setVal(name,v){ document.querySelectorAll('input[name="'+name+'"]').forEach(function(i){ i.checked = Array.isArray(v)? v.indexOf(i.value)>=0 : i.value===v; }); }
-  function fill(o){ ['animal','wish','age','family','home','away','trip','exp','allergy','future'].forEach(function(k){setVal(k,o[k]||'');});
+  function fill(o){ ['animal','wish','age','family','home','away','pets','trip','exp','allergy','future'].forEach(function(k){setVal(k,o[k]||'');});
     document.getElementById('breed').value=o.breed||''; document.getElementById('familyNote').value=o.familyNote||'';
-    document.getElementById('rule').value=o.rule||''; document.getElementById('free').value=o.free||''; }
+    document.getElementById('rule').value=o.rule||''; document.getElementById('petsNote').value=o.petsNote||''; document.getElementById('free').value=o.free||''; }
   fill(EXAMPLE);
   document.getElementById('clearBtn').onclick=function(){ fill({}); document.getElementById('exampleNote').hidden=true; };
   var last=null; try{ last=JSON.parse(localStorage.getItem('shippo_last')||'null'); }catch(e){ last=null; }
@@ -154,7 +158,7 @@ footer{margin-top:40px;font-size:12px;color:var(--muted);border-top:1px solid va
     var t=function(id){var v=document.getElementById(id).value.trim();return v||'（記入なし）';};
     return ['迎えたい動物: '+get('animal')+'（種類: '+t('breed')+'）','その動物への思い: '+get('wish'),'相談者の年代: '+get('age'),
       '一緒に暮らす人: '+get('family')+'（補足: '+t('familyNote')+'）','住まい: '+get('home')+'（飼える動物の決まり: '+t('rule')+'）',
-      '平日、家に誰もいない時間: '+get('away'),'泊まりがけの外出: '+get('trip'),'動物を飼った経験: '+get('exp'),
+      '平日、家に誰もいない時間: '+get('away'),'いま一緒に暮らしている動物: '+get('pets')+'（補足: '+t('petsNote')+'）','泊まりがけの外出: '+get('trip'),'動物を飼った経験: '+get('exp'),
       '家族の動物アレルギー: '+get('allergy'),'これからの予定: '+get('future'),'相談したいこと: '+t('free')].join('\n');
   }
   var KB07=document.getElementById('kb07').textContent, KB00=document.getElementById('kb00').textContent;
