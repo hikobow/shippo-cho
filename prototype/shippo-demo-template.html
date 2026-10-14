@@ -51,6 +51,7 @@ input[type=text]:focus,textarea:focus{outline:2px solid var(--accent);outline-of
 .shop{display:flex;gap:12px;align-items:center;flex-wrap:wrap;border:1px dashed var(--line);border-radius:12px;padding:12px 14px;font-size:14px}
 .shop p{margin:0;flex:1 1 220px;min-width:0}
 .fu{display:grid;gap:14px;margin-bottom:16px}
+.sub{margin:6px 0 2px;font-size:13px;color:var(--muted)}
 .fu label{font-weight:700;display:block;margin-bottom:6px}
 #followup,.err{color:var(--amber)}
 footer{margin-top:40px;font-size:12px;color:var(--muted);border-top:1px solid var(--line);padding-top:12px}
@@ -69,8 +70,9 @@ footer{margin-top:40px;font-size:12px;color:var(--muted);border-top:1px solid va
 
 <form id="f" novalidate>
   <fieldset><legend>迎えたい動物</legend><div class="opts" data-name="animal" data-type="radio">
-    <span>犬</span><span>猫</span><span>小鳥</span><span>ハムスター</span><span>モルモット</span><span>まだ決めていない</span></div>
-    <input type="text" id="breed" placeholder="種類や犬種・猫種が決まっていれば（例: トイプードル）">
+    <span>犬</span><span>猫</span><span>小鳥</span><span>ハムスター</span><span>モルモット</span><span>その他の動物</span><span>まだ決めていない</span></div>
+    <div id="breedWrap" hidden><p class="sub" id="breedLabel">種類</p><div class="opts" id="breedBox" data-name="breedPick" data-type="radio"></div></div>
+    <input type="text" id="breed" hidden placeholder="種類を書いてください">
   </fieldset>
   <fieldset><legend>その動物への思い</legend><div class="opts" data-name="wish" data-type="radio">
     <span>どうしてもこの動物がいい</span><span>できればこの動物がいい</span><span>なんとなく考えている</span></div></fieldset>
@@ -81,8 +83,12 @@ footer{margin-top:40px;font-size:12px;color:var(--muted);border-top:1px solid va
     <input type="text" id="familyNote" placeholder="子どもの年齢など（例: 中学生の娘1人）">
   </fieldset>
   <fieldset><legend>住まい</legend><div class="opts" data-name="home" data-type="radio">
-    <span>戸建て（持ち家）</span><span>戸建て（賃貸）</span><span>マンション（持ち家）</span><span>マンション・アパート（賃貸）</span></div>
+    <span>戸建て</span><span>マンション</span><span>アパート</span><span>その他</span></div>
     <input type="text" id="rule" placeholder="飼える動物の決まり（例: 小型犬1匹まで）">
+  </fieldset>
+  <fieldset><legend>平日の日中、家族はどう過ごしていますか<small>複数選べます</small></legend><div class="opts" data-name="daytime" data-type="checkbox">
+    <span>家にいる（仕事はしていない）</span><span>在宅勤務（仕事中は手が離せない）</span><span>外で仕事・学校</span><span>パート・時短勤務</span><span>日によって違う</span></div>
+    <input type="text" id="daytimeNote" placeholder="補足があれば（例: 妻は週3日在宅勤務、会議が多い）">
   </fieldset>
   <fieldset><legend>平日、家に誰もいない時間</legend><div class="opts" data-name="away" data-type="radio">
     <span>ほとんど誰かが家にいる</span><span>6時間以内</span><span>6時間超〜10時間以内</span><span>10時間超</span></div></fieldset>
@@ -90,14 +96,17 @@ footer{margin-top:40px;font-size:12px;color:var(--muted);border-top:1px solid va
     <span>いない</span><span>いる</span></div>
     <input type="text" id="petsNote" placeholder="いる場合は、種類・年齢・頭数（例: 11歳の猫1匹）">
   </fieldset>
-  <fieldset><legend>泊まりがけの外出（旅行・出張など）</legend><div class="opts" data-name="trip" data-type="radio">
-    <span>ほとんどない</span><span>年に数回</span><span>月に1回以上</span></div></fieldset>
+  <fieldset><legend>泊まりがけの外出（旅行・出張・帰省など）</legend><div class="opts" data-name="trip" data-type="radio">
+    <span>ほとんどない</span><span>年に1〜2回</span><span>年に3〜6回</span><span>月に1回くらい</span><span>月に2回以上</span></div></fieldset>
   <fieldset><legend>動物を飼った経験</legend><div class="opts" data-name="exp" data-type="radio">
-    <span>自分で飼ったことがある</span><span>家族が飼っていた</span><span>ない</span></div></fieldset>
+    <span>自分で飼ったことがある</span><span>家族が飼っていた</span><span>ない</span></div>
+    <div id="expWrap" hidden><p class="sub">飼っていた動物<small>複数選べます</small></p><div class="opts" data-name="expAnimal" data-type="checkbox">
+    <span>犬</span><span>猫</span><span>小鳥</span><span>ハムスター</span><span>モルモット</span><span>その他</span></div></div>
+  </fieldset>
   <fieldset><legend>家族の動物アレルギー</legend><div class="opts" data-name="allergy" data-type="radio">
     <span>ない</span><span>ある・疑いがある</span><span>分からない</span></div></fieldset>
   <fieldset><legend>これからの予定<small>複数選べます</small></legend><div class="opts" data-name="future" data-type="checkbox">
-    <span>転勤・引っ越し</span><span>結婚</span><span>妊娠・出産</span><span>子どもの独立</span><span>特にない</span></div></fieldset>
+    <span>転勤・引っ越し</span><span>結婚</span><span>妊娠・出産</span><span>子どもの独立</span><span>介護</span><span>特にない</span></div></fieldset>
   <fieldset><legend><label for="free">相談したいこと</label></legend>
     <textarea id="free" placeholder="気になっていること、迷っていることを自由に"></textarea></fieldset>
   <div class="actions"><button class="btn" id="go" type="submit">アドバイスを受け取る</button><span class="err" id="formErr" role="status"></span></div>
@@ -113,7 +122,6 @@ footer{margin-top:40px;font-size:12px;color:var(--muted);border-top:1px solid va
 <section id="answer" hidden aria-live="polite">
   <h2>しっぽ帳からのアドバイス</h2>
   <div class="card"><div class="bubble" id="out"></div></div>
-  <div class="actions"><button class="btn ghost" id="stop" type="button" hidden>止める</button></div>
   <div class="shop" id="shop" hidden><p>この内容で、お近くのペットショップの子を探す</p><button type="button" class="btn ghost" id="shopBtn">お店を探す（デモ）</button></div>
   <p class="err" id="shopNote" hidden>試作版のため、お店の案内はまだつながっていません。</p>
   <div class="actions" id="after" hidden>
@@ -133,7 +141,7 @@ footer{margin-top:40px;font-size:12px;color:var(--muted);border-top:1px solid va
 <script>
 (function(){
   // ---- options ----
-  document.querySelectorAll('.opts').forEach(function(box){
+  function build(box){
     var name=box.dataset.name, type=box.dataset.type;
     Array.from(box.querySelectorAll('span')).forEach(function(sp,i){
       var id=name+'_'+i, inp=document.createElement('input');
@@ -141,13 +149,37 @@ footer{margin-top:40px;font-size:12px;color:var(--muted);border-top:1px solid va
       var lab=document.createElement('label'); lab.htmlFor=id; lab.textContent=sp.textContent;
       box.replaceChild(inp,sp); box.insertBefore(lab,inp.nextSibling);
     });
-  });
-  var EXAMPLE={animal:'犬',wish:'できればこの動物がいい',age:'40代',family:['配偶者・パートナー','子ども'],home:'マンション（持ち家）',away:'6時間以内',pets:'いない',trip:'年に数回',exp:'ない',allergy:'ない',future:['子どもの独立'],
-    breed:'', familyNote:'中学1年の娘', rule:'小型犬1匹まで', free:'本当は大型犬に憧れていますが、マンションの決まりで小型犬しか飼えません。家族で散歩やお出かけを楽しみたいです。どんな犬が合いますか？'};
+  }
+  document.querySelectorAll('.opts').forEach(function(box){ if(box.id!=='breedBox') build(box); });
+  var BREEDS={
+    '犬':['トイプードル','チワワ','ミニチュアダックスフンド','ポメラニアン','柴犬','フレンチブルドッグ','ミニチュアシュナウザー','シーズー','パグ','ペキニーズ','ミニチュアピンシャー','ジャックラッセルテリア','ウェルシュコーギー','ビーグル','シェットランド・シープドッグ','ボーダーコリー','ゴールデンレトリバー','ラブラドールレトリバー','MIX（ミックス犬）'],
+    '猫':['雑種（日本猫）','スコティッシュフォールド','マンチカン','ラグドール','アメリカンショートヘア','ブリティッシュショートヘア','ミヌエット','ノルウェージャンフォレストキャット','サイベリアン','ラガマフィン','メインクーン','ベンガル','ロシアンブルー','エキゾチックショートヘア','ペルシャ'],
+    '小鳥':['文鳥','セキセイインコ','ボタンインコ','コザクラインコ','オカメインコ'],
+    'ハムスター':['ゴールデン','キンクマ','ジャンガリアン','ロボロフスキー','キャンベル','チャイニーズ'],
+    'モルモット':[]
+  };
+  var breedBox=document.getElementById('breedBox'), breedText=document.getElementById('breed');
+  function renderBreeds(animal, keep){
+    var list=BREEDS[animal]; breedBox.innerHTML='';
+    var wrap=document.getElementById('breedWrap');
+    if(animal==='その他の動物'){ wrap.hidden=true; breedText.hidden=false; breedText.placeholder='動物の種類を書いてください'; return; }
+    if(!list||animal==='まだ決めていない'){ wrap.hidden=true; breedText.hidden=true; return; }
+    document.getElementById('breedLabel').textContent=(animal==='犬'?'犬種':animal==='猫'?'猫種':'種類')+'（決まっていれば）';
+    list.concat(['まだ決めていない','その他']).forEach(function(n){ var sp=document.createElement('span'); sp.textContent=n; breedBox.append(sp); });
+    build(breedBox); wrap.hidden=false;
+    breedBox.querySelectorAll('input').forEach(function(i){ i.checked=(i.value===keep); i.onchange=function(){ breedText.hidden=(i.value!=='その他'); if(!breedText.hidden){breedText.placeholder='種類を書いてください';} }; });
+    breedText.hidden=(keep!=='その他');
+  }
+  document.querySelectorAll('input[name="animal"]').forEach(function(i){ i.addEventListener('change',function(){ breedText.value=''; renderBreeds(i.value,''); }); });
+  document.querySelectorAll('input[name="exp"]').forEach(function(i){ i.addEventListener('change',function(){ document.getElementById('expWrap').hidden=(i.value==='ない'); }); });
+  var EXAMPLE={animal:'犬',breedPick:'まだ決めていない',wish:'できればこの動物がいい',age:'40代',family:['配偶者・パートナー','子ども'],home:'マンション',daytime:['外で仕事・学校','パート・時短勤務'],away:'6時間以内',pets:'いない',trip:'年に1〜2回',exp:'ない',allergy:'ない',future:['子どもの独立'],
+    familyNote:'中学1年の娘', rule:'小型犬1匹まで', daytimeNote:'妻は週3日のパート', free:'本当は大型犬に憧れていますが、マンションの決まりで小型犬しか飼えません。家族で散歩やお出かけを楽しみたいです。どんな犬が合いますか？'};
+  var FIELDS=['animal','wish','age','family','home','daytime','away','pets','trip','exp','expAnimal','allergy','future'];
   function setVal(name,v){ document.querySelectorAll('input[name="'+name+'"]').forEach(function(i){ i.checked = Array.isArray(v)? v.indexOf(i.value)>=0 : i.value===v; }); }
-  function fill(o){ ['animal','wish','age','family','home','away','pets','trip','exp','allergy','future'].forEach(function(k){setVal(k,o[k]||'');});
-    document.getElementById('breed').value=o.breed||''; document.getElementById('familyNote').value=o.familyNote||'';
-    document.getElementById('rule').value=o.rule||''; document.getElementById('petsNote').value=o.petsNote||''; document.getElementById('free').value=o.free||''; }
+  function fill(o){ FIELDS.forEach(function(k){setVal(k,o[k]||'');});
+    ['breed','familyNote','rule','daytimeNote','petsNote','free'].forEach(function(id){ document.getElementById(id).value=o[id]||''; });
+    renderBreeds(o.animal||'', o.breedPick||''); if(o.breedPick==='その他'){breedText.hidden=false;}
+    document.getElementById('expWrap').hidden=!(o.exp&&o.exp!=='ない'); }
   fill(EXAMPLE);
   document.getElementById('clearBtn').onclick=function(){ fill({}); document.getElementById('exampleNote').hidden=true; };
   var last=null; try{ last=JSON.parse(localStorage.getItem('shippo_last')||'null'); }catch(e){ last=null; }
@@ -156,9 +188,12 @@ footer{margin-top:40px;font-size:12px;color:var(--muted);border-top:1px solid va
   function get(name){ var a=Array.from(document.querySelectorAll('input[name="'+name+'"]:checked')).map(function(i){return i.value}); return a.join('、')||'（未回答）'; }
   function profile(){
     var t=function(id){var v=document.getElementById(id).value.trim();return v||'（記入なし）';};
-    return ['迎えたい動物: '+get('animal')+'（種類: '+t('breed')+'）','その動物への思い: '+get('wish'),'相談者の年代: '+get('age'),
+    var bp=get('breedPick'); var breed=(bp==='その他'||get('animal')==='その他の動物')? t('breed') : bp;
+    return ['迎えたい動物: '+get('animal')+'（種類: '+breed+'）','その動物への思い: '+get('wish'),'相談者の年代: '+get('age'),
       '一緒に暮らす人: '+get('family')+'（補足: '+t('familyNote')+'）','住まい: '+get('home')+'（飼える動物の決まり: '+t('rule')+'）',
-      '平日、家に誰もいない時間: '+get('away'),'いま一緒に暮らしている動物: '+get('pets')+'（補足: '+t('petsNote')+'）','泊まりがけの外出: '+get('trip'),'動物を飼った経験: '+get('exp'),
+      '平日の日中の過ごし方: '+get('daytime')+'（補足: '+t('daytimeNote')+'）','平日、家に誰もいない時間: '+get('away'),
+      'いま一緒に暮らしている動物: '+get('pets')+'（補足: '+t('petsNote')+'）','泊まりがけの外出: '+get('trip'),
+      '動物を飼った経験: '+get('exp')+(get('exp')!=='ない'?'（飼っていた動物: '+get('expAnimal')+'）':''),
       '家族の動物アレルギー: '+get('allergy'),'これからの予定: '+get('future'),'相談したいこと: '+t('free')].join('\n');
   }
   var KB07=document.getElementById('kb07').textContent, KB00=document.getElementById('kb00').textContent;
@@ -167,11 +202,13 @@ footer{margin-top:40px;font-size:12px;color:var(--muted);border-top:1px solid va
     +'# 守ること\n- 下の「判断原理」に厳密に従う。特にP0（相談対応の基本の流れ）、P4（希望の扱い）、P12（相談の問いに答える）、P13（重み付け）。ユキさんの経験則は、ほかの情報より優先する。\n'
     +'- 使ってよい知識は、下の「判断原理」と「データ」だけ。そこにないことは推測で言い切らず、「分からない」「獣医師に確認を」とする。\n'
     +'- 判定ではなくアドバイス。相談者に語りかける、やさしい日本語で書く。見出し・箇条書き・記号の多用はせず、短い段落で。800〜1400字。\n'
+    +'- 書き方はソフトに。「心配です」「お勧めしにくい」「〜が要ります」より、「〜しておくと安心です」「〜するとぐっと楽になります」「〜という方法もあります」のように、相談者が前向きに考えられる言い方を選ぶ。注意点は、責めずに、一緒に考える口調で伝える。\n'
     +'- 判断原理の番号（P0など）、「重み」「意向の型」などの内部の言葉、出典番号は、回答に書かない。\n'
     +'- 費用の金額は書かない（大型犬は費用がかかる、程度はよい）。\n- 相談者の気持ちを、書かれていないことまで推測して決めつけない。\n'
     +'- 書く前に心の中で、意向の型（決まり具合と思いの強さ）と、重み3の条件の照合を行い、その結果に沿って結論を決める（この過程は書かない）。\n'
     +'- 最初の段落で、相談の問いに答える。ただし最初の一文で「無理」「できません」「お勧めしにくい」と言い切らない。まず相談者の希望や気持ちを受け止め、そのうえで条件との関係を伝え、合わない場合も次の道とあわせて伝える。\n'
     +'- 希望の動物で条件が合わないところがあっても、条件を重ねただけで不向きとしない。まず、その動物のまま実現するために何が必要か（準備、迎える時期、支援）を示す。それでも難しい場合は、同じ動物の中で別の品種・迎え方を考える。別の動物は、その動物そのものが暮らしと合わない場合にだけ、可能性として示す。\n'
+    +'- 同じことを二度書かない。一つの話題は一つの段落で言い切り、最後の段落で前の内容をくり返してまとめない。相談票や追加の質問の答え（「〜とのことで」）は、結論に関わる時だけ短く触れ、全部を言い直さない。「安心です」など同じ結びの言葉を何度も使わず、言い方を変える。\n'
     +'- わざわざ扱わないことを断る一文（例:「ほかの動物のことは、ここでは触れません」）は書かない。\n'
     +'- 先住の動物がいる相談では、迎える場合の助け（データにある、先住の子を優先する、最初は部屋を分けて少しずつ慣らす、など）も短く添える。\n\n'
     +'# 相談者の回答（相談票）\n'+p+'\n\n# 判断原理（07）\n'+KB07+'\n\n# データ（00 横断比較表）\n'+KB00;
@@ -180,11 +217,10 @@ footer{margin-top:40px;font-size:12px;color:var(--muted);border-top:1px solid va
   // ---- AI ----
   var samplePromise = (window.claude && window.claude.use) ? window.claude.use('sample') : Promise.resolve(null);
   var dbPromise = (window.claude && window.claude.use) ? window.claude.use('db').catch(function(){return null;}) : Promise.resolve(null);
-  var ctl=null, base='', qs=[];
+  var base='', qs=[];
   var out=document.getElementById('out');
   function msg(code){ return ({not_granted:'AIの利用が許可されなかったため、回答を作れませんでした。',sampling_disabled:'このアカウントでは、AIの回答を利用できません。',rate_limited:'混み合っています。少し時間をおいて、もう一度お試しください。',refused:'この内容には回答できませんでした。内容を変えてお試しください。',session_expired:'ログインし直してから、もう一度お試しください。',invalid_json:'確認の質問を作れませんでした。もう一度お試しください。'})[code]||'途中で問題が起きました。もう一度お試しください。'; }
   function show(id){ ['followup','answer'].forEach(function(k){document.getElementById(k).hidden=(k!==id);}); }
-  document.getElementById('stop').onclick=function(){ ctl&&ctl.abort(); };
 
   async function advise(extra){
     show('answer'); document.getElementById('shop').hidden=true; document.getElementById('after').hidden=true;
@@ -192,14 +228,13 @@ footer{margin-top:40px;font-size:12px;color:var(--muted);border-top:1px solid va
     var sample=await samplePromise;
     if(!sample){ out.textContent='このページでAIの回答を出すには、Claudeにログインした状態で開いてください。'; out.classList.add('err'); return; }
     out.classList.remove('err'); out.classList.add('thinking'); out.textContent='考えています…（30秒〜1分ほどかかります）';
-    ctl=new AbortController(); var stop=document.getElementById('stop'); stop.hidden=false;
     try{
       var prof=profile(); var r=await sample(base+(extra?'\n\n# 追加の質問への答え\n'+extra:'')+'\n\n上の相談票に対して、相談者へのアドバイスを書いてください。',
-        {signal:ctl.signal,onText:function(u){out.classList.remove('thinking');out.textContent=u.text;}});
+        {onText:function(u){out.classList.remove('thinking');out.textContent=u.text;}});
       document.getElementById('shop').hidden=false;
       afterDone({profile:prof,followup:extra||'',answer:r.text,at:new Date().toISOString()});
     }catch(e){ out.classList.remove('thinking'); out.textContent=e.text||''; if(e.code!=='cancelled'){ var p=document.createElement('p'); p.className='err'; p.textContent=msg(e.code); out.append(document.createElement('br'),p);} }
-    finally{ stop.hidden=true; document.getElementById('go').disabled=false; if(document.getElementById('after').hidden){ document.getElementById('after').hidden=false; document.getElementById('copyBtn').hidden=!out.textContent; } }
+    finally{ document.getElementById('go').disabled=false; if(document.getElementById('after').hidden){ document.getElementById('after').hidden=false; document.getElementById('copyBtn').hidden=!out.textContent; } }
   }
 
   document.getElementById('f').addEventListener('submit', async function(ev){
@@ -211,20 +246,32 @@ footer{margin-top:40px;font-size:12px;color:var(--muted);border-top:1px solid va
     var sample=await samplePromise;
     if(!sample){ advise(''); return; }
     err.textContent='確認したいことがあるか、見ています…';
-    try{
-      var r=await sample.json(base+'\n\n相談票を読み、アドバイスを決めるのに欠かせない情報が足りなければ、相談者への追加の質問を最大3つ作ってください。相談票で分かることは聞かない。結論を変えうる情報を優先する（例: 迎えた直後に家にいられるか、世話が難しくなったときに頼れる人や預け先、毎日の散歩などの体力）。足りていれば空の配列にする。やさしい日本語の短い質問で。JSONだけで答える: {"questions":["…"]}',{modelTier:'quick'});
-      qs=(r&&Array.isArray(r.questions)?r.questions:[]).map(String).filter(Boolean).slice(0,3);
-    }catch(e){ qs=[]; }
+    qaAll=''; round=0;
+    var q=await askFollow(5);
     err.textContent='';
-    if(!qs.length){ advise(''); return; }
-    var list=document.getElementById('fuList'); list.innerHTML='';
-    qs.forEach(function(q,i){ var d=document.createElement('div'); var l=document.createElement('label'); l.htmlFor='fu'+i; l.textContent=q;
-      var t=document.createElement('textarea'); t.id='fu'+i; t.rows=2; d.append(l,t); list.append(d); });
-    show('followup'); document.getElementById('followup').scrollIntoView({behavior:'smooth',block:'start'});
+    if(!q.length){ advise(''); return; }
+    showFollow(q);
   });
-  document.getElementById('fuGo').onclick=function(){
-    var extra=qs.map(function(q,i){ var v=document.getElementById('fu'+i).value.trim(); return 'Q: '+q+'\nA: '+(v||'（分からない・答えなし）'); }).join('\n');
-    advise(extra);
+  var qaAll='', round=0;
+  async function askFollow(max){
+    var sample=await samplePromise; if(!sample) return [];
+    var prompt=base+(qaAll?'\n\n# これまでの追加の質問と答え\n'+qaAll:'')+'\n\n相談票'+(qaAll?'とこれまでの答え':'')+'を読み、アドバイスを決めるのに欠かせない情報がまだ足りなければ、相談者への追加の質問を作ってください。ふだんは3つまで、どうしても必要な場合だけ最大'+max+'つまで。相談票やこれまでの答えで分かることは聞かない。質問どうしで同じことを聞かない（似た内容は一つにまとめる）。結論を変えうる情報を優先する（例: 迎えた直後に家にいられるか、世話が難しくなったときに頼れる人や預け先、毎日の散歩などの体力、飼っていた動物の経験の中身）。足りていれば空の配列にする。やわらかい、やさしい日本語の短い質問で。JSONだけで答える: {"questions":["…"]}';
+    try{ var r=await sample.json(prompt,{modelTier:'quick',cache:false}); return (r&&Array.isArray(r.questions)?r.questions:[]).map(String).filter(Boolean).slice(0,max); }catch(e){ return []; }
+  }
+  function showFollow(list){
+    qs=list; round++;
+    document.getElementById('fuLead').textContent= round===1 ? 'アドバイスの前に、いくつか教えてください。分からないものは空欄のままで大丈夫です。' : 'ありがとうございます。もう少しだけ教えてください。';
+    var box=document.getElementById('fuList'); box.innerHTML='';
+    qs.forEach(function(q,i){ var d=document.createElement('div'); var l=document.createElement('label'); l.htmlFor='fu'+i; l.textContent=q;
+      var t=document.createElement('textarea'); t.id='fu'+i; t.rows=2; d.append(l,t); box.append(d); });
+    show('followup'); document.getElementById('followup').scrollIntoView({behavior:'smooth',block:'start'});
+  }
+  document.getElementById('fuGo').onclick=async function(){
+    var b=this; b.disabled=true;
+    qaAll+=(qaAll?'\n':'')+qs.map(function(q,i){ var v=document.getElementById('fu'+i).value.trim(); return 'Q: '+q+'\nA: '+(v||'（分からない・答えなし）'); }).join('\n');
+    if(round<2){ document.getElementById('fuLead').textContent='答えを読んでいます…';
+      var more=await askFollow(3); b.disabled=false; if(more.length){ showFollow(more); return; } }
+    b.disabled=false; advise(qaAll);
   };
   var current=null;
   function afterDone(rec){ current=rec; document.getElementById('after').hidden=false; document.getElementById('copyBtn').hidden=false; document.getElementById('afterMsg').textContent='';
@@ -242,7 +289,7 @@ footer{margin-top:40px;font-size:12px;color:var(--muted);border-top:1px solid va
       m.textContent='記録に残しました。'; b.hidden=true; }
     catch(e){ m.textContent='記録に残せませんでした（記録できるのは、このページの持ち主だけです）。'; b.disabled=false; } };
   document.getElementById('again').onclick=function(){ show(null); document.getElementById('f').scrollIntoView({behavior:'smooth'}); };
-  document.getElementById('restart').onclick=function(){ fill({}); show(null); document.getElementById('exampleNote').hidden=true; window.scrollTo({top:0,behavior:'smooth'}); };
+  document.getElementById('restart').onclick=function(){ fill({}); qaAll=''; round=0; show(null); document.getElementById('exampleNote').hidden=true; window.scrollTo({top:0,behavior:'smooth'}); };
   document.getElementById('shopBtn').onclick=function(){ document.getElementById('shopNote').hidden=false; };
 })();
 </script>
