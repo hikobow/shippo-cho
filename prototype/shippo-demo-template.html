@@ -1,0 +1,243 @@
+<title>しっぽ帳</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@500;700&family=Noto+Sans+JP:wght@400;500;700&display=swap">
+<style>
+/* 一列の相談票。上から順に答え、下で回答を受け取り、そのまま会話を続ける */
+:root{
+  --bg:#f5f7f4; --surface:#ffffff; --ink:#1e2a25; --muted:#5d6b64; --line:#d9e1dc;
+  --accent:#2f6b5a; --accent-ink:#ffffff; --accent-soft:#e3efe9; --amber:#a86d1a; --amber-soft:#f8eedd;
+  --display:"Zen Maru Gothic","Hiragino Maru Gothic ProN","Noto Sans JP",sans-serif;
+  --body:"Noto Sans JP","Hiragino Sans","Yu Gothic",sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#141a17; --surface:#1c2420; --ink:#e7ede9; --muted:#9fb0a7; --line:#2f3b35;
+  --accent:#7cc3a9; --accent-ink:#10201a; --accent-soft:#22352d; --amber:#e3b062; --amber-soft:#3a2f1d; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#141a17; --surface:#1c2420; --ink:#e7ede9; --muted:#9fb0a7; --line:#2f3b35;
+  --accent:#7cc3a9; --accent-ink:#10201a; --accent-soft:#22352d; --amber:#e3b062; --amber-soft:#3a2f1d; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.75;padding-inline:16px;padding-block:0 48px}
+.wrap{max-width:680px;margin:0 auto}
+header{display:flex;align-items:center;justify-content:space-between;gap:12px;padding-block:20px 8px}
+.brand{font-family:var(--display);font-weight:700;font-size:24px;letter-spacing:.04em;color:var(--accent);display:flex;align-items:center;gap:8px}
+.brand svg{width:28px;height:28px}
+.chip{font-size:12px;padding:2px 10px;border-radius:999px;background:var(--amber-soft);color:var(--amber);letter-spacing:.05em;white-space:nowrap}
+.lead{color:var(--muted);margin:4px 0 20px;text-wrap:pretty}
+h2{font-family:var(--display);font-weight:700;font-size:19px;margin:0 0 4px;text-wrap:balance}
+.note{display:flex;gap:10px;align-items:center;flex-wrap:wrap;font-size:13px;color:var(--muted);background:var(--accent-soft);border-radius:10px;padding:8px 12px;margin-bottom:16px}
+.note button{margin-left:auto}
+form{display:grid;gap:22px}
+fieldset{border:0;margin:0;padding:0;display:grid;gap:8px;min-width:0}
+legend{font-weight:700;font-size:15px;padding:0;margin-bottom:6px}
+legend small{font-weight:400;color:var(--muted);margin-left:6px}
+.opts{display:flex;flex-wrap:wrap;gap:8px}
+.opts input{position:absolute;opacity:0;pointer-events:none}
+.opts label{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:6px 14px;cursor:pointer;font-size:14px;transition:background .15s,border-color .15s}
+.opts input:checked+label{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.opts input:focus-visible+label{outline:2px solid var(--accent);outline-offset:2px}
+input[type=text],textarea{width:100%;font:inherit;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:10px 12px}
+textarea{min-height:88px;resize:vertical}
+input[type=text]:focus,textarea:focus{outline:2px solid var(--accent);outline-offset:1px}
+.btn{font:inherit;font-weight:700;border:0;border-radius:12px;padding:12px 20px;background:var(--accent);color:var(--accent-ink);cursor:pointer}
+.btn:disabled{opacity:.5;cursor:default}
+.btn.ghost{background:transparent;color:var(--accent);border:1px solid var(--accent);font-weight:500;padding:6px 12px;font-size:13px;border-radius:999px}
+.btn:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+.actions{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:20px}
+.bubble{white-space:pre-wrap;text-wrap:pretty}
+.thinking{color:var(--muted)}
+.who{font-size:12px;color:var(--muted);margin-bottom:4px;letter-spacing:.05em}
+.shop{display:flex;gap:12px;align-items:center;flex-wrap:wrap;border:1px dashed var(--line);border-radius:12px;padding:12px 14px;font-size:14px}
+.shop p{margin:0;flex:1 1 220px;min-width:0}
+.fu{display:grid;gap:14px;margin-bottom:16px}
+.fu label{font-weight:700;display:block;margin-bottom:6px}
+#followup,.err{color:var(--amber)}
+footer{margin-top:40px;font-size:12px;color:var(--muted);border-top:1px solid var(--line);padding-top:12px}
+@media (prefers-reduced-motion: reduce){*{transition:none!important}}
+</style>
+
+<div class="wrap">
+<header>
+  <div class="brand"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M6 24c4 1 9-1 11-6 2-5 6-7 10-6" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><circle cx="25" cy="9" r="2.5" fill="currentColor"/></svg>しっぽ帳</div>
+  <span class="chip">試作版</span>
+</header>
+<p class="lead">迎えたい動物と、いまの暮らしを教えてください。必要なら、こちらからいくつか確認の質問をします。そのうえで、獣医師の経験をもとにした考え方で、あなたの暮らしに合う迎え方をアドバイスします。</p>
+
+<div class="note" id="lastNote" hidden><span>前回のアドバイスが残っています。</span><button type="button" class="btn ghost" id="lastBtn">前回のアドバイスを見る</button></div>
+<div class="note" id="exampleNote"><span>例として入力してあります。あなたの内容に書き換えてお使いください。</span><button type="button" class="btn ghost" id="clearBtn">入力を消す</button></div>
+
+<form id="f" novalidate>
+  <fieldset><legend>迎えたい動物</legend><div class="opts" data-name="animal" data-type="radio">
+    <span>犬</span><span>猫</span><span>小鳥</span><span>ハムスター</span><span>モルモット</span><span>まだ決めていない</span></div>
+    <input type="text" id="breed" placeholder="種類や犬種・猫種が決まっていれば（例: トイプードル）">
+  </fieldset>
+  <fieldset><legend>その動物への思い</legend><div class="opts" data-name="wish" data-type="radio">
+    <span>どうしてもこの動物がいい</span><span>できればこの動物がいい</span><span>なんとなく考えている</span></div></fieldset>
+  <fieldset><legend>あなたの年代</legend><div class="opts" data-name="age" data-type="radio">
+    <span>20代以下</span><span>30代</span><span>40代</span><span>50代</span><span>60代</span><span>70代以上</span></div></fieldset>
+  <fieldset><legend>一緒に暮らす人<small>複数選べます</small></legend><div class="opts" data-name="family" data-type="checkbox">
+    <span>一人暮らし</span><span>配偶者・パートナー</span><span>子ども</span><span>親</span><span>その他</span></div>
+    <input type="text" id="familyNote" placeholder="子どもの年齢など（例: 中学生の娘1人）">
+  </fieldset>
+  <fieldset><legend>住まい</legend><div class="opts" data-name="home" data-type="radio">
+    <span>戸建て（持ち家）</span><span>戸建て（賃貸）</span><span>マンション（持ち家）</span><span>マンション・アパート（賃貸）</span></div>
+    <input type="text" id="rule" placeholder="飼える動物の決まり（例: 小型犬1匹まで）">
+  </fieldset>
+  <fieldset><legend>平日、家に誰もいない時間</legend><div class="opts" data-name="away" data-type="radio">
+    <span>ほとんど誰かがいる</span><span>6時間くらいまで</span><span>6〜10時間</span><span>10時間以上</span></div></fieldset>
+  <fieldset><legend>泊まりがけの外出（旅行・出張など）</legend><div class="opts" data-name="trip" data-type="radio">
+    <span>ほとんどない</span><span>年に数回</span><span>月に1回以上</span></div></fieldset>
+  <fieldset><legend>動物を飼った経験</legend><div class="opts" data-name="exp" data-type="radio">
+    <span>自分で飼ったことがある</span><span>家族が飼っていた</span><span>ない</span></div></fieldset>
+  <fieldset><legend>家族の動物アレルギー</legend><div class="opts" data-name="allergy" data-type="radio">
+    <span>ない</span><span>ある・疑いがある</span><span>分からない</span></div></fieldset>
+  <fieldset><legend>これからの予定<small>複数選べます</small></legend><div class="opts" data-name="future" data-type="checkbox">
+    <span>転勤・引っ越し</span><span>結婚</span><span>妊娠・出産</span><span>子どもの独立</span><span>特にない</span></div></fieldset>
+  <fieldset><legend><label for="free">相談したいこと</label></legend>
+    <textarea id="free" placeholder="気になっていること、迷っていることを自由に"></textarea></fieldset>
+  <div class="actions"><button class="btn" id="go" type="submit">アドバイスを受け取る</button><span class="err" id="formErr" role="status"></span></div>
+</form>
+
+<section id="followup" hidden aria-live="polite">
+  <h2>もう少し教えてください</h2>
+  <p class="lead" id="fuLead">アドバイスの前に、いくつか確認させてください。分からないものは空欄のままで大丈夫です。</p>
+  <div id="fuList" class="fu"></div>
+  <div class="actions"><button class="btn" id="fuGo" type="button">答えてアドバイスを受け取る</button></div>
+</section>
+
+<section id="answer" hidden aria-live="polite">
+  <h2>しっぽ帳からのアドバイス</h2>
+  <div class="card"><div class="bubble" id="out"></div></div>
+  <div class="actions"><button class="btn ghost" id="stop" type="button" hidden>止める</button></div>
+  <div class="shop" id="shop" hidden><p>この内容で、お近くのペットショップの子を探す</p><button type="button" class="btn ghost" id="shopBtn">お店を探す（デモ）</button></div>
+  <p class="err" id="shopNote" hidden>試作版のため、お店の案内はまだつながっていません。</p>
+  <div class="actions" id="after" hidden>
+    <button class="btn ghost" id="copyBtn" type="button">アドバイスをコピー</button>
+    <button class="btn ghost" id="saveBtn" type="button" hidden>この相談を記録に残す（検証用）</button>
+    <button class="btn ghost" id="again" type="button">相談票を書き直す</button>
+    <button class="btn ghost" id="restart" type="button">最初からやり直す</button>
+  </div>
+  <p class="lead" id="afterMsg" role="status"></p>
+</section>
+
+<footer>しっぽ帳は、動物を迎えるかどうかを決めるものではなく、考えるためのアドバイスです。最終的な判断はご家族で、また健康のことはかかりつけの獣医師にご相談ください。<br>試作版: 回答はAIが作成します。直前のアドバイスは、この端末のブラウザにだけ残ります。「記録に残す」を押した場合だけ、相談票とアドバイスが検証用に保存されます。</footer>
+</div>
+
+<script type="text/plain" id="kb07">__KB07__</script>
+<script type="text/plain" id="kb00">__KB00__</script>
+<script>
+(function(){
+  // ---- options ----
+  document.querySelectorAll('.opts').forEach(function(box){
+    var name=box.dataset.name, type=box.dataset.type;
+    Array.from(box.querySelectorAll('span')).forEach(function(sp,i){
+      var id=name+'_'+i, inp=document.createElement('input');
+      inp.type=type; inp.name=name; inp.id=id; inp.value=sp.textContent;
+      var lab=document.createElement('label'); lab.htmlFor=id; lab.textContent=sp.textContent;
+      box.replaceChild(inp,sp); box.insertBefore(lab,inp.nextSibling);
+    });
+  });
+  var EXAMPLE={animal:'犬',wish:'できればこの動物がいい',age:'40代',family:['配偶者・パートナー','子ども'],home:'マンション（持ち家）',away:'6時間くらいまで',trip:'年に数回',exp:'ない',allergy:'ない',future:['子どもの独立'],
+    breed:'', familyNote:'中学1年の娘', rule:'小型犬1匹まで', free:'本当は大型犬に憧れていますが、マンションの決まりで小型犬しか飼えません。家族で散歩やお出かけを楽しみたいです。どんな犬が合いますか？'};
+  function setVal(name,v){ document.querySelectorAll('input[name="'+name+'"]').forEach(function(i){ i.checked = Array.isArray(v)? v.indexOf(i.value)>=0 : i.value===v; }); }
+  function fill(o){ ['animal','wish','age','family','home','away','trip','exp','allergy','future'].forEach(function(k){setVal(k,o[k]||'');});
+    document.getElementById('breed').value=o.breed||''; document.getElementById('familyNote').value=o.familyNote||'';
+    document.getElementById('rule').value=o.rule||''; document.getElementById('free').value=o.free||''; }
+  fill(EXAMPLE);
+  document.getElementById('clearBtn').onclick=function(){ fill({}); document.getElementById('exampleNote').hidden=true; };
+  var last=null; try{ last=JSON.parse(localStorage.getItem('shippo_last')||'null'); }catch(e){ last=null; }
+  if(last&&last.answer){ document.getElementById('lastNote').hidden=false; }
+
+  function get(name){ var a=Array.from(document.querySelectorAll('input[name="'+name+'"]:checked')).map(function(i){return i.value}); return a.join('、')||'（未回答）'; }
+  function profile(){
+    var t=function(id){var v=document.getElementById(id).value.trim();return v||'（記入なし）';};
+    return ['迎えたい動物: '+get('animal')+'（種類: '+t('breed')+'）','その動物への思い: '+get('wish'),'相談者の年代: '+get('age'),
+      '一緒に暮らす人: '+get('family')+'（補足: '+t('familyNote')+'）','住まい: '+get('home')+'（飼える動物の決まり: '+t('rule')+'）',
+      '平日、家に誰もいない時間: '+get('away'),'泊まりがけの外出: '+get('trip'),'動物を飼った経験: '+get('exp'),
+      '家族の動物アレルギー: '+get('allergy'),'これからの予定: '+get('future'),'相談したいこと: '+t('free')].join('\n');
+  }
+  var KB07=document.getElementById('kb07').textContent, KB00=document.getElementById('kb00').textContent;
+  function rules(p){
+    return 'あなたは「しっぽ帳」です。ペットを迎えたい人に、獣医師（小動物臨床20年）の経験をもとにした判断原理で、飼育のアドバイスをします。\n\n'
+    +'# 守ること\n- 下の「判断原理」に厳密に従う。特にP0（相談対応の基本の流れ）、P4（希望の扱い）、P12（相談の問いに答える）、P13（重み付け）。ユキさんの経験則は、ほかの情報より優先する。\n'
+    +'- 使ってよい知識は、下の「判断原理」と「データ」だけ。そこにないことは推測で言い切らず、「分からない」「獣医師に確認を」とする。\n'
+    +'- 判定ではなくアドバイス。相談者に語りかける、やさしい日本語で書く。見出し・箇条書き・記号の多用はせず、短い段落で。800〜1400字。\n'
+    +'- 判断原理の番号（P0など）、「重み」「意向の型」などの内部の言葉、出典番号は、回答に書かない。\n'
+    +'- 費用の金額は書かない（大型犬は費用がかかる、程度はよい）。\n- 相談者の気持ちを、書かれていないことまで推測して決めつけない。\n'
+    +'- 書く前に心の中で、意向の型（決まり具合と思いの強さ）と、重み3の条件の照合を行い、その結果に沿って結論を決める（この過程は書かない）。\n'
+    +'- 最初の段落で、相談の問いに答える。ただし最初の一文で「無理」「できません」「お勧めしにくい」と言い切らない。まず相談者の希望や気持ちを受け止め、そのうえで条件との関係を伝え、合わない場合も次の道とあわせて伝える。\n'
+    +'- わざわざ扱わないことを断る一文（例:「ほかの動物のことは、ここでは触れません」）は書かない。\n'
+    +'- 先住の動物がいる相談では、迎える場合の助け（データにある、先住の子を優先する、最初は部屋を分けて少しずつ慣らす、など）も短く添える。\n\n'
+    +'# 相談者の回答（相談票）\n'+p+'\n\n# 判断原理（07）\n'+KB07+'\n\n# データ（00 横断比較表）\n'+KB00;
+  }
+
+  // ---- AI ----
+  var samplePromise = (window.claude && window.claude.use) ? window.claude.use('sample') : Promise.resolve(null);
+  var dbPromise = (window.claude && window.claude.use) ? window.claude.use('db').catch(function(){return null;}) : Promise.resolve(null);
+  var ctl=null, base='', qs=[];
+  var out=document.getElementById('out');
+  function msg(code){ return ({not_granted:'AIの利用が許可されなかったため、回答を作れませんでした。',sampling_disabled:'このアカウントでは、AIの回答を利用できません。',rate_limited:'混み合っています。少し時間をおいて、もう一度お試しください。',refused:'この内容には回答できませんでした。内容を変えてお試しください。',session_expired:'ログインし直してから、もう一度お試しください。',invalid_json:'確認の質問を作れませんでした。もう一度お試しください。'})[code]||'途中で問題が起きました。もう一度お試しください。'; }
+  function show(id){ ['followup','answer'].forEach(function(k){document.getElementById(k).hidden=(k!==id);}); }
+  document.getElementById('stop').onclick=function(){ ctl&&ctl.abort(); };
+
+  async function advise(extra){
+    show('answer'); document.getElementById('shop').hidden=true; document.getElementById('after').hidden=true;
+    document.getElementById('answer').scrollIntoView({behavior:'smooth',block:'start'});
+    var sample=await samplePromise;
+    if(!sample){ out.textContent='このページでAIの回答を出すには、Claudeにログインした状態で開いてください。'; out.classList.add('err'); return; }
+    out.classList.remove('err'); out.classList.add('thinking'); out.textContent='考えています…（30秒〜1分ほどかかります）';
+    ctl=new AbortController(); var stop=document.getElementById('stop'); stop.hidden=false;
+    try{
+      var prof=profile(); var r=await sample(base+(extra?'\n\n# 追加の質問への答え\n'+extra:'')+'\n\n上の相談票に対して、相談者へのアドバイスを書いてください。',
+        {signal:ctl.signal,onText:function(u){out.classList.remove('thinking');out.textContent=u.text;}});
+      document.getElementById('shop').hidden=false;
+      afterDone({profile:prof,followup:extra||'',answer:r.text,at:new Date().toISOString()});
+    }catch(e){ out.classList.remove('thinking'); out.textContent=e.text||''; if(e.code!=='cancelled'){ var p=document.createElement('p'); p.className='err'; p.textContent=msg(e.code); out.append(document.createElement('br'),p);} }
+    finally{ stop.hidden=true; document.getElementById('go').disabled=false; if(document.getElementById('after').hidden){ document.getElementById('after').hidden=false; document.getElementById('copyBtn').hidden=!out.textContent; } }
+  }
+
+  document.getElementById('f').addEventListener('submit', async function(ev){
+    ev.preventDefault();
+    var err=document.getElementById('formErr');
+    if(get('animal')==='（未回答）'){ err.textContent='「迎えたい動物」を選んでください。'; return; }
+    var go=document.getElementById('go'); go.disabled=true;
+    base=rules(profile());
+    var sample=await samplePromise;
+    if(!sample){ advise(''); return; }
+    err.textContent='確認したいことがあるか、見ています…';
+    try{
+      var r=await sample.json(base+'\n\n相談票を読み、アドバイスを決めるのに欠かせない情報が足りなければ、相談者への追加の質問を最大3つ作ってください。相談票で分かることは聞かない。足りていれば空の配列にする。やさしい日本語の短い質問で。JSONだけで答える: {"questions":["…"]}',{modelTier:'quick'});
+      qs=(r&&Array.isArray(r.questions)?r.questions:[]).map(String).filter(Boolean).slice(0,3);
+    }catch(e){ qs=[]; }
+    err.textContent='';
+    if(!qs.length){ advise(''); return; }
+    var list=document.getElementById('fuList'); list.innerHTML='';
+    qs.forEach(function(q,i){ var d=document.createElement('div'); var l=document.createElement('label'); l.htmlFor='fu'+i; l.textContent=q;
+      var t=document.createElement('textarea'); t.id='fu'+i; t.rows=2; d.append(l,t); list.append(d); });
+    show('followup'); document.getElementById('followup').scrollIntoView({behavior:'smooth',block:'start'});
+  });
+  document.getElementById('fuGo').onclick=function(){
+    var extra=qs.map(function(q,i){ var v=document.getElementById('fu'+i).value.trim(); return 'Q: '+q+'\nA: '+(v||'（分からない・答えなし）'); }).join('\n');
+    advise(extra);
+  };
+  var current=null;
+  function afterDone(rec){ current=rec; document.getElementById('after').hidden=false; document.getElementById('copyBtn').hidden=false; document.getElementById('afterMsg').textContent='';
+    try{ localStorage.setItem('shippo_last',JSON.stringify(rec)); }catch(e){}
+    dbPromise.then(function(db){ document.getElementById('saveBtn').hidden=!db; }); }
+  document.getElementById('lastBtn').onclick=function(){ if(!last) return; show('answer'); out.classList.remove('thinking','err'); out.textContent=last.answer;
+    current=last; document.getElementById('after').hidden=false; document.getElementById('copyBtn').hidden=false; document.getElementById('shop').hidden=false;
+    dbPromise.then(function(db){ document.getElementById('saveBtn').hidden=!db; });
+    document.getElementById('answer').scrollIntoView({behavior:'smooth',block:'start'}); };
+  document.getElementById('copyBtn').onclick=function(){ var m=document.getElementById('afterMsg'); var t=out.textContent;
+    try{ navigator.clipboard.writeText(t).then(function(){m.textContent='コピーしました。';},function(){sel();}); }catch(e){ sel(); }
+    function sel(){ var r=document.createRange(); r.selectNodeContents(out); var g=getSelection(); g.removeAllRanges(); g.addRange(r); m.textContent='文章を選択しました。コピーしてお使いください。'; } };
+  document.getElementById('saveBtn').onclick=async function(){ var m=document.getElementById('afterMsg'); var b=this; b.disabled=true;
+    try{ var db=await dbPromise; if(!db||!current) throw 0; await db.collection('records').add({at:new Date().toISOString(),profile:current.profile,followup:current.followup||'',answer:current.answer});
+      m.textContent='記録に残しました。'; b.hidden=true; }
+    catch(e){ m.textContent='記録に残せませんでした（記録できるのは、このページの持ち主だけです）。'; b.disabled=false; } };
+  document.getElementById('again').onclick=function(){ show(null); document.getElementById('f').scrollIntoView({behavior:'smooth'}); };
+  document.getElementById('restart').onclick=function(){ fill({}); show(null); document.getElementById('exampleNote').hidden=true; window.scrollTo({top:0,behavior:'smooth'}); };
+  document.getElementById('shopBtn').onclick=function(){ document.getElementById('shopNote').hidden=false; };
+})();
+</script>
