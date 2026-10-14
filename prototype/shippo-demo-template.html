@@ -65,6 +65,7 @@ footer{margin-top:40px;font-size:12px;color:var(--muted);border-top:1px solid va
 </header>
 <p class="lead">迎えたい動物と、いまの暮らしを教えてください。必要なら、こちらからいくつか確認の質問をします。そのうえで、獣医師の経験をもとにした考え方で、あなたの暮らしに合う迎え方をアドバイスします。</p>
 
+<div class="note" id="draftNote" hidden><span id="draftMsg">前回の相談が途中で残っています。</span><button type="button" class="btn ghost" id="draftGo">続きから</button><button type="button" class="btn ghost" id="draftNew" style="margin-left:0">新しく始める</button></div>
 <div class="note" id="lastNote" hidden><span>前回のアドバイスが残っています。</span><button type="button" class="btn ghost" id="lastBtn">前回のアドバイスを見る</button></div>
 <div class="note" id="exampleNote"><span>例として入力してあります。あなたの内容に書き換えてお使いください。</span><button type="button" class="btn ghost" id="clearBtn">入力を消す</button></div>
 
@@ -106,7 +107,7 @@ footer{margin-top:40px;font-size:12px;color:var(--muted);border-top:1px solid va
   <fieldset><legend>家族の動物アレルギー</legend><div class="opts" data-name="allergy" data-type="radio">
     <span>ない</span><span>ある・疑いがある</span><span>分からない</span></div></fieldset>
   <fieldset><legend>これからの予定<small>複数選べます</small></legend><div class="opts" data-name="future" data-type="checkbox">
-    <span>転勤・引っ越し</span><span>結婚</span><span>妊娠・出産</span><span>子どもの独立</span><span>介護</span><span>特にない</span></div></fieldset>
+    <span>転勤</span><span>引っ越し・住み替え</span><span>結婚</span><span>妊娠・出産</span><span>子どもの独立</span><span>介護</span><span>特にない</span></div></fieldset>
   <fieldset><legend><label for="free">相談したいこと</label></legend>
     <textarea id="free" placeholder="気になっていること、迷っていることを自由に"></textarea></fieldset>
   <div class="actions"><button class="btn" id="go" type="submit">アドバイスを受け取る</button><span class="err" id="formErr" role="status"></span></div>
@@ -184,6 +185,20 @@ footer{margin-top:40px;font-size:12px;color:var(--muted);border-top:1px solid va
   document.getElementById('clearBtn').onclick=function(){ fill({}); document.getElementById('exampleNote').hidden=true; };
   var last=null; try{ last=JSON.parse(localStorage.getItem('shippo_last')||'null'); }catch(e){ last=null; }
   if(last&&last.answer){ document.getElementById('lastNote').hidden=false; }
+  // ---- 途中保存（この端末のブラウザだけ） ----
+  var TEXTS=['breed','familyNote','rule','daytimeNote','petsNote','free'];
+  function snap(){ var o={}; FIELDS.concat(['breedPick']).forEach(function(k){ var ins=document.querySelectorAll('input[name="'+k+'"]'); var v=Array.from(ins).filter(function(i){return i.checked}).map(function(i){return i.value});
+      o[k]=(ins[0]&&ins[0].type==='checkbox')? v : (v[0]||''); });
+    TEXTS.forEach(function(id){ o[id]=document.getElementById(id).value; }); return o; }
+  var stage='form';
+  function saveDraft(){ try{ var fu=[]; if(stage==='followup'){ fu=qs.map(function(q,i){ var t=document.getElementById('fu'+i); return t?t.value:''; }); }
+      localStorage.setItem('shippo_draft',JSON.stringify({stage:stage,form:snap(),qaAll:qaAll,round:round,qs:qs,fu:fu,at:Date.now()})); }catch(e){} }
+  function clearDraft(){ try{ localStorage.removeItem('shippo_draft'); }catch(e){} }
+  var draft=null; try{ draft=JSON.parse(localStorage.getItem('shippo_draft')||'null'); }catch(e){ draft=null; }
+  if(draft&&draft.form){ document.getElementById('draftNote').hidden=false;
+    document.getElementById('draftMsg').textContent= draft.stage==='followup' ? '前回の相談が、追加の質問のところで止まっています。' : draft.stage==='advising' ? '前回の相談が、アドバイスを作っている途中で止まっています。' : '前回の相談票が、書きかけで残っています。'; }
+  document.getElementById('f').addEventListener('input',function(){ if(stage==='form') saveDraft(); });
+  document.getElementById('f').addEventListener('change',function(){ if(stage==='form') saveDraft(); });
 
   function get(name){ var a=Array.from(document.querySelectorAll('input[name="'+name+'"]:checked')).map(function(i){return i.value}); return a.join('、')||'（未回答）'; }
   function profile(){
@@ -223,6 +238,7 @@ footer{margin-top:40px;font-size:12px;color:var(--muted);border-top:1px solid va
   function show(id){ ['followup','answer'].forEach(function(k){document.getElementById(k).hidden=(k!==id);}); }
 
   async function advise(extra){
+    stage='advising'; saveDraft();
     show('answer'); document.getElementById('shop').hidden=true; document.getElementById('after').hidden=true;
     document.getElementById('answer').scrollIntoView({behavior:'smooth',block:'start'});
     var sample=await samplePromise;
@@ -232,7 +248,7 @@ footer{margin-top:40px;font-size:12px;color:var(--muted);border-top:1px solid va
       var prof=profile(); var r=await sample(base+(extra?'\n\n# 追加の質問への答え\n'+extra:'')+'\n\n上の相談票に対して、相談者へのアドバイスを書いてください。',
         {onText:function(u){out.classList.remove('thinking');out.textContent=u.text;}});
       document.getElementById('shop').hidden=false;
-      afterDone({profile:prof,followup:extra||'',answer:r.text,at:new Date().toISOString()});
+      afterDone({profile:prof,followup:extra||'',answer:r.text,at:new Date().toISOString()}); stage='done'; clearDraft();
     }catch(e){ out.classList.remove('thinking'); out.textContent=e.text||''; if(e.code!=='cancelled'){ var p=document.createElement('p'); p.className='err'; p.textContent=msg(e.code); out.append(document.createElement('br'),p);} }
     finally{ document.getElementById('go').disabled=false; if(document.getElementById('after').hidden){ document.getElementById('after').hidden=false; document.getElementById('copyBtn').hidden=!out.textContent; } }
   }
@@ -246,7 +262,7 @@ footer{margin-top:40px;font-size:12px;color:var(--muted);border-top:1px solid va
     var sample=await samplePromise;
     if(!sample){ advise(''); return; }
     err.textContent='確認したいことがあるか、見ています…';
-    qaAll=''; round=0;
+    qaAll=''; round=0; stage='asking'; saveDraft();
     var q=await askFollow(5);
     err.textContent='';
     if(!q.length){ advise(''); return; }
@@ -259,16 +275,16 @@ footer{margin-top:40px;font-size:12px;color:var(--muted);border-top:1px solid va
     try{ var r=await sample.json(prompt,{modelTier:'quick',cache:false}); return (r&&Array.isArray(r.questions)?r.questions:[]).map(String).filter(Boolean).slice(0,max); }catch(e){ return []; }
   }
   function showFollow(list){
-    qs=list; round++;
+    qs=list; round++; stage='followup';
     document.getElementById('fuLead').textContent= round===1 ? 'アドバイスの前に、いくつか教えてください。分からないものは空欄のままで大丈夫です。' : 'ありがとうございます。もう少しだけ教えてください。';
     var box=document.getElementById('fuList'); box.innerHTML='';
     qs.forEach(function(q,i){ var d=document.createElement('div'); var l=document.createElement('label'); l.htmlFor='fu'+i; l.textContent=q;
       var t=document.createElement('textarea'); t.id='fu'+i; t.rows=2; d.append(l,t); box.append(d); });
-    show('followup'); document.getElementById('followup').scrollIntoView({behavior:'smooth',block:'start'});
+    show('followup'); saveDraft(); document.getElementById('followup').scrollIntoView({behavior:'smooth',block:'start'});
   }
   document.getElementById('fuGo').onclick=async function(){
     var b=this; b.disabled=true;
-    qaAll+=(qaAll?'\n':'')+qs.map(function(q,i){ var v=document.getElementById('fu'+i).value.trim(); return 'Q: '+q+'\nA: '+(v||'（分からない・答えなし）'); }).join('\n');
+    saveDraft(); qaAll+=(qaAll?'\n':'')+qs.map(function(q,i){ var v=document.getElementById('fu'+i).value.trim(); return 'Q: '+q+'\nA: '+(v||'（分からない・答えなし）'); }).join('\n');
     if(round<2){ document.getElementById('fuLead').textContent='答えを読んでいます…';
       var more=await askFollow(3); b.disabled=false; if(more.length){ showFollow(more); return; } }
     b.disabled=false; advise(qaAll);
@@ -288,8 +304,15 @@ footer{margin-top:40px;font-size:12px;color:var(--muted);border-top:1px solid va
     try{ var db=await dbPromise; if(!db||!current) throw 0; await db.collection('records').add({at:new Date().toISOString(),profile:current.profile,followup:current.followup||'',answer:current.answer});
       m.textContent='記録に残しました。'; b.hidden=true; }
     catch(e){ m.textContent='記録に残せませんでした（記録できるのは、このページの持ち主だけです）。'; b.disabled=false; } };
-  document.getElementById('again').onclick=function(){ show(null); document.getElementById('f').scrollIntoView({behavior:'smooth'}); };
-  document.getElementById('restart').onclick=function(){ fill({}); qaAll=''; round=0; show(null); document.getElementById('exampleNote').hidden=true; window.scrollTo({top:0,behavior:'smooth'}); };
+  document.getElementById('again').onclick=function(){ stage='form'; show(null); document.getElementById('f').scrollIntoView({behavior:'smooth'}); };
+  document.getElementById('restart').onclick=function(){ fill({}); qaAll=''; round=0; stage='form'; clearDraft(); show(null); document.getElementById('exampleNote').hidden=true; window.scrollTo({top:0,behavior:'smooth'}); };
+  document.getElementById('fuList').addEventListener('input',function(){ saveDraft(); });
+  document.getElementById('draftNew').onclick=function(){ clearDraft(); document.getElementById('draftNote').hidden=true; };
+  document.getElementById('draftGo').onclick=function(){ var d=draft; document.getElementById('draftNote').hidden=true; document.getElementById('exampleNote').hidden=true; if(!d) return;
+    fill(d.form); qaAll=d.qaAll||''; round=d.round||0; base=rules(profile());
+    if(d.stage==='followup'&&d.qs&&d.qs.length){ round=Math.max(0,round-1); stage='followup'; showFollow(d.qs); (d.fu||[]).forEach(function(v,i){ var t=document.getElementById('fu'+i); if(t) t.value=v; }); }
+    else if(d.stage==='advising'){ advise(qaAll); }
+    else { stage='form'; document.getElementById('f').scrollIntoView({behavior:'smooth'}); } };
   document.getElementById('shopBtn').onclick=function(){ document.getElementById('shopNote').hidden=false; };
 })();
 </script>
