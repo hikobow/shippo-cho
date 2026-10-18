@@ -27,6 +27,8 @@ header{display:flex;align-items:center;justify-content:space-between;gap:12px;pa
 h2{font-family:var(--display);font-weight:700;font-size:19px;margin:0 0 4px;text-wrap:balance}
 .note{display:flex;gap:10px;align-items:center;flex-wrap:wrap;font-size:13px;color:var(--muted);background:var(--accent-soft);border-radius:10px;padding:8px 12px;margin-bottom:16px}
 .note button{margin-left:auto}
+.ctx{margin-bottom:12px}.ctx summary{cursor:pointer;font-size:14px;color:var(--muted);padding:6px 0}.ctxBody{white-space:pre-wrap;font-size:14px;line-height:1.7}
+.cf{margin:0;display:grid;gap:6px}.cf dt{font-size:12px;color:var(--muted);margin-top:6px}.cf dd{margin:0;font-size:15px;white-space:pre-wrap;word-break:break-word}
 .savebar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:10px;font-size:13px;color:var(--muted)}
 .draft{background:#fff4d6;color:#5a4300;font-size:14px;border:1px solid #f0d58a}
 @media (prefers-color-scheme: dark){.draft{background:#3a3115;color:#f3e2b0;border-color:#6b5a26}}
@@ -117,6 +119,13 @@ footer{margin-top:40px;font-size:12px;color:var(--muted);border-top:1px solid va
   <div class="savebar"><button class="btn ghost" id="saveForm" type="button">💾 ここまで保存する</button><span class="saveStat" role="status">書いた内容は自動でも保存されます。閉じても、次に開いたときに続きから書けます。</span></div>
 </form>
 
+<section id="confirm" hidden aria-live="polite">
+  <h2>この内容で相談しますか？</h2>
+  <p class="lead">書いた内容をもう一度ご確認ください。違うところがあれば「直す」を押してください。</p>
+  <div class="card"><dl id="cfList" class="cf"></dl></div>
+  <div class="actions"><button class="btn" id="cfGo" type="button">この内容で相談する</button><button class="btn ghost" id="cfBack" type="button">直す</button></div>
+</section>
+
 <section id="followup" hidden aria-live="polite">
   <h2>もう少し教えてください</h2>
   <p class="lead" id="fuLead">アドバイスの前に、いくつか確認させてください。分からないものは空欄のままで大丈夫です。</p>
@@ -127,6 +136,7 @@ footer{margin-top:40px;font-size:12px;color:var(--muted);border-top:1px solid va
 
 <section id="answer" hidden aria-live="polite">
   <h2>しっぽ帳からのアドバイス</h2>
+  <details id="ctx" class="ctx" hidden><summary>この相談の内容（相談票と質問への答え）を見る</summary><div class="card"><div id="ctxBody" class="ctxBody"></div></div></details>
   <div class="card"><div class="bubble" id="out"></div></div>
   <div class="shop" id="shop" hidden><p>この内容で、お近くのペットショップの子を探す</p><button type="button" class="btn ghost" id="shopBtn">お店を探す（デモ）</button></div>
   <p class="err" id="shopNote" hidden>試作版のため、お店の案内はまだつながっていません。</p>
@@ -206,17 +216,18 @@ footer{margin-top:40px;font-size:12px;color:var(--muted);border-top:1px solid va
   function stat(t){ document.querySelectorAll('.saveStat').forEach(function(e){ e.textContent=t; }); }
   var saveTimer=null;
   function draftObj(){ var fu=[]; if(stage==='followup'){ fu=qs.map(function(q,i){ var t=document.getElementById('fu'+i); return t?t.value:''; }); }
-    return {stage:stage,form:snap(),qaAll:qaAll,round:round,qs:qs,fu:fu,partial:(stage==='advising'?out.textContent:''),at:Date.now()}; }
+    return {stage:stage,form:snap(),qaAll:qaAll,round:round,qs:qs,fu:fu,partial:(stage==='advising'?out.textContent:''),at:Date.now(),v:2}; }
   function saveDraft(now){ var d=draftObj(); try{ localStorage.setItem('shippo_draft',JSON.stringify(d)); }catch(e){}
     clearTimeout(saveTimer); saveTimer=setTimeout(function(){ myDocP.then(function(doc){ if(!doc) return false; return doc('draft').set({json:JSON.stringify(d)}).then(function(){return true;}); }).then(function(ok){ stat((ok?'保存しました（':'この端末に保存しました（')+hhmm(d.at)+'）'); },function(){ stat('この端末に保存しました（'+hhmm(d.at)+'）'); }); }, now?0:1500);
     if(now) stat('保存しています…'); }
   function clearDraft(){ try{ localStorage.removeItem('shippo_draft'); }catch(e){} myDocP.then(function(doc){ if(doc) return doc('draft').delete(); }).catch(function(){}); }
   var draft=null; try{ draft=JSON.parse(localStorage.getItem('shippo_draft')||'null'); }catch(e){ draft=null; }
+  if(draft&&draft.v!==2){ draft=null; try{ localStorage.removeItem('shippo_draft'); }catch(e){} }
   function showDraft(){ if(!(draft&&draft.form)) return; document.getElementById('draftNote').hidden=false;
     var w= draft.stage==='followup' ? '追加の質問のところ' : draft.stage==='advising' ? 'アドバイスを作っている途中' : '相談票を書いている途中';
     document.getElementById('draftMsg').textContent='📝 書きかけの相談があります（'+w+'。'+hhmm(draft.at)+' に保存）。'; }
   showDraft();
-  myDocP.then(function(doc){ if(!doc) return null; return doc('draft').get(); }).then(function(sn){ if(!sn||!sn.exists) return; var d=null; try{ d=JSON.parse(sn.data().json); }catch(e){} if(d&&d.form&&(!draft||d.at>draft.at)){ draft=d; showDraft(); } }).catch(function(){});
+  myDocP.then(function(doc){ if(!doc) return null; return doc('draft').get(); }).then(function(sn){ if(!sn||!sn.exists) return; var d=null; try{ d=JSON.parse(sn.data().json); }catch(e){} if(d&&d.form&&d.v===2&&(!draft||d.at>draft.at)){ draft=d; showDraft(); } }).catch(function(){});
   myDocP.then(function(doc){ if(!doc) return null; return doc('last').get(); }).then(function(sn){ if(!sn||!sn.exists) return; var r=null; try{ r=JSON.parse(sn.data().json); }catch(e){} if(r&&r.answer&&(!last||r.at>last.at)){ last=r; document.getElementById('lastNote').hidden=false; } }).catch(function(){});
   document.getElementById('f').addEventListener('input',function(){ if(stage==='form') saveDraft(); });
   document.getElementById('f').addEventListener('change',function(){ if(stage==='form') saveDraft(); });
@@ -248,6 +259,8 @@ footer{margin-top:40px;font-size:12px;color:var(--muted);border-top:1px solid va
     +'- 同じことを二度書かない。一つの話題は一つの段落で言い切り、最後の段落で前の内容をくり返してまとめない。相談票や追加の質問の答え（「〜とのことで」）は、結論に関わる時だけ短く触れ、全部を言い直さない。「安心です」「心強いです」など同じ結びの言葉は、一つの回答で2回までにして、言い方を変える。\n'
     +'- 追加の質問で答えがなかったものは、相談者が何か答えたように書かない（「〜は分からないとのこと」など）。触れる場合は「もし〜なら」「〜という方法もあります」の形で書く。\n'
     +'- 相談票で（未回答）の項目は、相談者が「まだ決めていない」と答えたものとして書かない。触れる場合は「まだ伺っていませんが」のように書く。\n'
+    +'- 思いが「なんとなく考えている」の相談で、ほかの動物も可能性として示す場合は、最初の段落で「ほかの動物も含めて、一緒に考えてみますね」のように一言添え、相談者が戸惑わないようにする。\n'
+    +'- 住まいが戸建てで、飼える動物の決まりが（記入なし）のときは、決まりには触れない。\n'
     +'- わざわざ扱わないことを断る一文（例:「ほかの動物のことは、ここでは触れません」）は書かない。\n'
     +'- 先住の動物がいる相談では、迎える場合の助け（データにある、先住の子を優先する、最初は部屋を分けて少しずつ慣らす、など）も短く添える。\n\n'
     +'# 相談者の回答（相談票）\n'+p+'\n\n# 判断原理（07）\n'+KB07+'\n\n# データ（00 横断比較表）\n'+KB00;
@@ -259,9 +272,10 @@ footer{margin-top:40px;font-size:12px;color:var(--muted);border-top:1px solid va
   var base='', qs=[];
   var out=document.getElementById('out');
   function msg(code){ return ({not_granted:'AIの利用が許可されなかったため、回答を作れませんでした。',sampling_disabled:'このアカウントでは、AIの回答を利用できません。',rate_limited:'混み合っています。少し時間をおいて、もう一度お試しください。',refused:'この内容には回答できませんでした。内容を変えてお試しください。',session_expired:'ログインし直してから、もう一度お試しください。',invalid_json:'確認の質問を作れませんでした。もう一度お試しください。'})[code]||'途中で問題が起きました。もう一度お試しください。'; }
-  function show(id){ ['followup','answer'].forEach(function(k){document.getElementById(k).hidden=(k!==id);}); }
+  function show(id){ ['confirm','followup','answer'].forEach(function(k){document.getElementById(k).hidden=(k!==id);}); }
 
   async function advise(extra){
+    document.getElementById('ctx').hidden=true;
     stage='advising'; saveDraft();
     show('answer'); document.getElementById('shop').hidden=true; document.getElementById('after').hidden=true;
     document.getElementById('answer').scrollIntoView({behavior:'smooth',block:'start'});
@@ -277,30 +291,38 @@ footer{margin-top:40px;font-size:12px;color:var(--muted);border-top:1px solid va
     finally{ document.getElementById('go').disabled=false; if(document.getElementById('after').hidden){ document.getElementById('after').hidden=false; document.getElementById('copyBtn').hidden=!out.textContent; } }
   }
 
-  document.getElementById('f').addEventListener('submit', async function(ev){
+  document.getElementById('f').addEventListener('submit', function(ev){
     ev.preventDefault();
     var err=document.getElementById('formErr');
     if(get('animal')==='（未回答）'){ err.textContent='「迎えたい動物」を選んでください。'; return; }
+    err.textContent='';
+    var box=document.getElementById('cfList'); box.innerHTML='';
+    profile().split('\n').forEach(function(line){ var i=line.indexOf(': '); var dt=document.createElement('dt'); dt.textContent=line.slice(0,i); var dd=document.createElement('dd'); dd.textContent=line.slice(i+2).replace(/（補足: （記入なし））|（飼える動物の決まり: （記入なし））/g,''); box.append(dt,dd); });
+    show('confirm'); document.getElementById('confirm').scrollIntoView({behavior:'smooth',block:'start'});
+  });
+  document.getElementById('cfBack').onclick=function(){ show(null); document.getElementById('f').scrollIntoView({behavior:'smooth'}); };
+  document.getElementById('cfGo').onclick=async function(){
+    var err=document.getElementById('cfGo'); var b=this; b.disabled=true;
     var go=document.getElementById('go'); go.disabled=true;
     base=rules(profile());
     var sample=await samplePromise;
-    if(!sample){ advise(''); return; }
-    err.textContent='確認したいことがあるか、見ています…';
+    if(!sample){ b.disabled=false; advise(''); return; }
+    b.textContent='確認したいことがあるか、見ています…';
     qaAll=''; round=0; stage='asking'; saveDraft();
-    var q=await askFollow(5);
-    err.textContent='';
+    var q=await askFollow(3);
+    b.textContent='この内容で相談する'; b.disabled=false;
     if(!q.length){ advise(''); return; }
     showFollow(q);
-  });
+  };
   var qaAll='', round=0;
   async function askFollow(max){
     var sample=await samplePromise; if(!sample) return [];
-    var prompt=base+(qaAll?'\n\n# これまでの追加の質問と答え\n'+qaAll:'')+'\n\n相談票'+(qaAll?'とこれまでの答え':'')+'を読み、アドバイスを決めるのに欠かせない情報がまだ足りなければ、相談者への追加の質問を作ってください。ふだんは3つまで、どうしても必要な場合だけ最大'+max+'つまで。相談票やこれまでの答えで分かることは聞かない。質問どうしで同じことを聞かない（似た内容は一つにまとめる）。相談票の中に、結論に関わる食い違い（例: 一緒に暮らす人と補足、住まいと飼える動物の決まり、すでに飼っている動物と決まり）があれば、それを確かめる質問を優先する。結論を変えうる情報を優先する（例: 迎えた直後に家にいられるか、世話が難しくなったときに頼れる人や預け先、毎日の散歩などの体力、飼っていた動物の経験の中身）。足りていれば空の配列にする。やわらかい、やさしい日本語の短い質問で。JSONだけで答える: {"questions":["…"]}';
-    try{ var r=await sample.json(prompt,{modelTier:'quick',cache:false}); return (r&&Array.isArray(r.questions)?r.questions:[]).map(String).filter(Boolean).slice(0,max); }catch(e){ return []; }
+    var prompt=base+(qaAll?'\n\n# これまでの追加の質問と答え\n'+qaAll:'')+'\n\n相談票'+(qaAll?'とこれまでの答え':'')+'を読み、アドバイスを決めるのに欠かせない情報がまだ足りなければ、相談者への追加の質問を作ってください。'+(qaAll?'これまでの答えで、結論が変わりそうなことが新しく分かった場合だけ、最大'+max+'つまで（なければ空の配列）。':'最大'+max+'つまで。数が少ないほどよい。')+'相談票やこれまでの答えで分かることは聞かない。質問どうしで同じことを聞かない（似た内容は一つにまとめる）。相談票の中に、結論に関わる食い違い（例: 一緒に暮らす人と補足、住まいと飼える動物の決まり、すでに飼っている動物と決まり）があれば、それを確かめる質問を優先する。1つの質問で聞くのは1つのことだけにする（「また、〜」と2つ目を足さない）。思いが「どうしても」で、その動物とどんな関わりを求めているか（一緒に出かけたい、触れ合いたい、そばにいてほしい、など）が相談票から分からない場合は、それを聞く質問を1つ入れる。結論を変えうる情報を優先する（例: 迎えた直後に家にいられるか、世話が難しくなったときに頼れる人や預け先、毎日の散歩などの体力、飼っていた動物の経験の中身）。足りていれば空の配列にする。やわらかい、やさしい日本語の短い質問で。JSONだけで答える: {"questions":["…"]}';
+    try{ var r=await sample.json(prompt,{cache:false}); return (r&&Array.isArray(r.questions)?r.questions:[]).map(String).filter(Boolean).slice(0,max); }catch(e){ return []; }
   }
   function showFollow(list){
     qs=list; round++; stage='followup';
-    document.getElementById('fuLead').textContent= round===1 ? 'アドバイスの前に、いくつか教えてください。分からないものは空欄のままで大丈夫です。' : 'ありがとうございます。もう少しだけ教えてください。';
+    document.getElementById('fuLead').textContent= (round===1 ? 'アドバイスの前に、'+qs.length+'つだけ教えてください。分からないものは空欄のままで大丈夫です。' : 'ありがとうございます。最後に、もう'+qs.length+'つだけ教えてください。');
     var box=document.getElementById('fuList'); box.innerHTML='';
     qs.forEach(function(q,i){ var d=document.createElement('div'); var l=document.createElement('label'); l.htmlFor='fu'+i; l.textContent=q;
       var t=document.createElement('textarea'); t.id='fu'+i; t.rows=2; d.append(l,t); box.append(d); });
@@ -310,16 +332,17 @@ footer{margin-top:40px;font-size:12px;color:var(--muted);border-top:1px solid va
     var b=this; b.disabled=true;
     saveDraft(); qaAll+=(qaAll?'\n':'')+qs.map(function(q,i){ var v=document.getElementById('fu'+i).value.trim(); return 'Q: '+q+'\nA: '+(v||'（分からない・答えなし）'); }).join('\n');
     if(round<2){ document.getElementById('fuLead').textContent='答えを読んでいます…';
-      var more=await askFollow(3); b.disabled=false; if(more.length){ showFollow(more); return; } }
+      var more=await askFollow(2); b.disabled=false; if(more.length){ showFollow(more); return; } }
     b.disabled=false; advise(qaAll);
   };
   var current=null;
-  function afterDone(rec){ current=rec; document.getElementById('after').hidden=false; document.getElementById('copyBtn').hidden=false; document.getElementById('copyAllBtn').hidden=false; document.getElementById('afterMsg').textContent='';
+  function showCtx(rec){ var d=document.getElementById('ctx'); if(!rec||!rec.profile){ d.hidden=true; return; } document.getElementById('ctxBody').textContent='【相談票】\n'+rec.profile+(rec.followup?'\n\n【追加の質問と答え】\n'+rec.followup:''); d.open=false; d.hidden=false; }
+  function afterDone(rec){ current=rec; showCtx(rec); document.getElementById('after').hidden=false; document.getElementById('copyBtn').hidden=false; document.getElementById('copyAllBtn').hidden=false; document.getElementById('afterMsg').textContent='';
     try{ localStorage.setItem('shippo_last',JSON.stringify(rec)); }catch(e){}
     last=rec; myDocP.then(function(doc){ if(doc) return doc('last').set({json:JSON.stringify(rec)}); }).catch(function(){});
     dbPromise.then(function(db){ document.getElementById('saveBtn').hidden=!db; }); }
   document.getElementById('lastBtn').onclick=function(){ if(!last) return; show('answer'); out.classList.remove('thinking','err'); out.textContent=last.answer;
-    current=last; document.getElementById('after').hidden=false; document.getElementById('copyBtn').hidden=false; document.getElementById('copyAllBtn').hidden=false; document.getElementById('shop').hidden=false;
+    current=last; showCtx(last); document.getElementById('after').hidden=false; document.getElementById('copyBtn').hidden=false; document.getElementById('copyAllBtn').hidden=false; document.getElementById('shop').hidden=false;
     dbPromise.then(function(db){ document.getElementById('saveBtn').hidden=!db; });
     document.getElementById('answer').scrollIntoView({behavior:'smooth',block:'start'}); };
   document.getElementById('copyAllBtn').onclick=function(){ var m=document.getElementById('afterMsg'); if(!current) return;
