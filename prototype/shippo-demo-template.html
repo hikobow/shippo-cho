@@ -84,6 +84,8 @@ footer{margin-top:40px;font-size:12px;color:var(--muted);border-top:1px solid va
     <span>どうしてもこの動物がいい</span><span>できればこの動物がいい</span><span>なんとなく考えている</span></div></fieldset>
   <fieldset><legend>あなたの年代</legend><div class="opts" data-name="age" data-type="radio">
     <span>20代以下</span><span>30代</span><span>40代</span><span>50代</span><span>60代</span><span>70代以上</span></div></fieldset>
+  <fieldset><legend>あなたの性別<small>答えなくても大丈夫です</small></legend><div class="opts" data-name="sex" data-type="radio">
+    <span>女性</span><span>男性</span><span>答えたくない</span></div></fieldset>
   <fieldset><legend>一緒に暮らす人<small>複数選べます</small></legend><div class="opts" data-name="family" data-type="checkbox">
     <span>一人暮らし</span><span>配偶者・パートナー</span><span>子ども</span><span>親</span><span>その他</span></div>
     <input type="text" id="familyNote" placeholder="子どもの年齢など（例: 中学生の娘1人）">
@@ -189,9 +191,9 @@ footer{margin-top:40px;font-size:12px;color:var(--muted);border-top:1px solid va
   }
   document.querySelectorAll('input[name="animal"]').forEach(function(i){ i.addEventListener('change',function(){ breedText.value=''; renderBreeds(i.value,''); }); });
   document.querySelectorAll('input[name="exp"]').forEach(function(i){ i.addEventListener('change',function(){ document.getElementById('expWrap').hidden=(i.value==='ない'); }); });
-  var EXAMPLE={animal:'犬',breedPick:'まだ決めていない',wish:'できればこの動物がいい',age:'40代',family:['配偶者・パートナー','子ども'],home:'マンション',daytime:['外で仕事・学校','パート・時短勤務'],away:'6時間以内',pets:'いない',trip:'年に1〜2回',exp:'ない',allergy:'ない',future:['子どもの独立'],
+  var EXAMPLE={animal:'犬',breedPick:'まだ決めていない',wish:'できればこの動物がいい',age:'40代',sex:'女性',family:['配偶者・パートナー','子ども'],home:'マンション',daytime:['外で仕事・学校','パート・時短勤務'],away:'6時間以内',pets:'いない',trip:'年に1〜2回',exp:'ない',allergy:'ない',future:['子どもの独立'],
     familyNote:'中学1年の娘', rule:'小型犬1匹まで', daytimeNote:'妻は週3日のパート', free:'本当は大型犬に憧れていますが、マンションの決まりで小型犬しか飼えません。家族で散歩やお出かけを楽しみたいです。どんな犬が合いますか？'};
-  var FIELDS=['animal','wish','age','family','home','daytime','away','pets','trip','exp','expAnimal','allergy','future'];
+  var FIELDS=['animal','wish','age','sex','family','home','daytime','away','pets','trip','exp','expAnimal','allergy','future'];
   function setVal(name,v){ document.querySelectorAll('input[name="'+name+'"]').forEach(function(i){ i.checked = Array.isArray(v)? v.indexOf(i.value)>=0 : i.value===v; }); }
   function fill(o){ FIELDS.forEach(function(k){setVal(k,o[k]||'');});
     ['breed','familyNote','rule','daytimeNote','petsNote','free'].forEach(function(id){ document.getElementById(id).value=o[id]||''; });
@@ -237,7 +239,7 @@ footer{margin-top:40px;font-size:12px;color:var(--muted);border-top:1px solid va
   function profile(){
     var t=function(id){var v=document.getElementById(id).value.trim();return v||'（記入なし）';};
     var bp=get('breedPick'); var breed=(bp==='その他'||get('animal')==='その他の動物')? t('breed') : bp;
-    return ['迎えたい動物: '+get('animal')+'（種類: '+breed+'）','その動物への思い: '+get('wish'),'相談者の年代: '+get('age'),
+    return ['迎えたい動物: '+get('animal')+'（種類: '+breed+'）','その動物への思い: '+get('wish'),'相談者の年代: '+get('age'),'相談者の性別: '+(get('sex')==='（未回答）'?'答えなし':get('sex')),
       '一緒に暮らす人: '+get('family')+'（補足: '+t('familyNote')+'）','住まい: '+get('home')+'（飼える動物の決まり: '+t('rule')+'）',
       '平日の日中の過ごし方: '+get('daytime')+'（補足: '+t('daytimeNote')+'）','平日、家に誰もいない時間: '+get('away'),
       'いま一緒に暮らしている動物: '+get('pets')+'（補足: '+t('petsNote')+'）','泊まりがけの外出: '+get('trip'),
