@@ -29,6 +29,14 @@ h2{font-family:var(--display);font-weight:700;font-size:19px;margin:0 0 4px;text
 .note button{margin-left:auto}
 .ctx{margin-bottom:12px}.ctx summary{cursor:pointer;font-size:14px;color:var(--muted);padding:6px 0}.ctxBody{white-space:pre-wrap;font-size:14px;line-height:1.7}
 .cf{margin:0;display:grid;gap:6px}.cf dt{font-size:12px;color:var(--muted);margin-top:6px}.cf dd{margin:0;font-size:15px;white-space:pre-wrap;word-break:break-word}
+.picks{margin:18px 0 6px}.picks h3{font-family:var(--display);font-size:16px;margin:0 0 10px}
+.pickList{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+.pick{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:12px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:6px}
+.pick svg{width:72px;height:72px}
+.pick b{font-family:var(--display);font-size:15px}
+.pick span{font-size:12px;color:var(--muted);line-height:1.5}
+.pick button{margin-top:auto;font-size:13px;padding:6px 12px}
+.pickHint{font-size:12px;color:var(--muted);margin:8px 0 0}
 .savebar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:10px;font-size:13px;color:var(--muted)}
 .draft{background:#fff4d6;color:#5a4300;font-size:14px;border:1px solid #f0d58a}
 @media (prefers-color-scheme: dark){.draft{background:#3a3115;color:#f3e2b0;border-color:#6b5a26}}
@@ -140,13 +148,18 @@ footer{margin-top:40px;font-size:12px;color:var(--muted);border-top:1px solid va
   <h2>しっぽ帳からのアドバイス</h2>
   <details id="ctx" class="ctx" hidden><summary>この相談の内容（相談票と質問への答え）を見る</summary><div class="card"><div id="ctxBody" class="ctxBody"></div></div></details>
   <div class="card"><div class="bubble" id="out"></div></div>
-  <div class="shop" id="shop" hidden><p>この内容で、お近くのペットショップの子を探す</p><button type="button" class="btn ghost" id="shopBtn">お店を探す（デモ）</button></div>
-  <p class="err" id="shopNote" hidden>試作版のため、お店の案内はまだつながっていません。</p>
+  <div class="picks" id="shop" hidden>
+    <h3>この相談でお話しした動物</h3>
+    <div id="pickList" class="pickList"></div>
+    <p class="pickHint">絵の下のボタンから、お店でその子たちを見られます。</p>
+    <p class="err" id="shopNote" hidden>試作版のため、お店のページにはまだつながっていません。</p>
+  </div>
   <div class="actions" id="after" hidden>
     <button class="btn ghost" id="copyBtn" type="button">アドバイスをコピー</button>
     <button class="btn ghost" id="copyAllBtn" type="button" hidden>相談票・質問・アドバイスをまとめてコピー</button>
     <button class="btn ghost" id="saveBtn" type="button" hidden>この相談を記録に残す（検証用）</button>
     <button class="btn ghost" id="again" type="button">相談票を書き直す</button>
+    <button class="btn ghost" id="reuse" type="button">同じ相談票でもう一度相談する</button>
     <button class="btn ghost" id="restart" type="button">最初からやり直す</button>
   </div>
   <p class="lead" id="afterMsg" role="status"></p>
@@ -263,6 +276,7 @@ footer{margin-top:40px;font-size:12px;color:var(--muted);border-top:1px solid va
     +'- 相談票で（未回答）の項目は、相談者が「まだ決めていない」と答えたものとして書かない。触れる場合は「まだ伺っていませんが」のように書く。\n'
     +'- 思いが「なんとなく考えている」の相談で、ほかの動物も可能性として示す場合は、最初の段落で「ほかの動物も含めて、一緒に考えてみますね」のように一言添え、相談者が戸惑わないようにする。\n'
     +'- 住まいが戸建てで、飼える動物の決まりが（記入なし）のときは、決まりには触れない。\n'
+    +'- 犬や猫を候補にするときは、判断原理P0の5のとおり、条件に合う品種を2〜3挙げ、それぞれ、その子と暮らす楽しさや魅力（性格など）をひとつと、お世話で気をつけることをひとつ、短く添える。深く掘り下げず、前向きに（「まだ決めていない」「なんとなく」の相談でも挙げる。データにある品種から選ぶ）。品種を挙げるときは、勧める候補だけを示し、外した品種を並べて外した理由を書かない（相談者が名前を挙げた品種が合わない場合は、その品種についてだけ伝える）。\n'
     +'- わざわざ扱わないことを断る一文（例:「ほかの動物のことは、ここでは触れません」）は書かない。\n'
     +'- 先住の動物がいる相談では、迎える場合の助け（データにある、先住の子を優先する、最初は部屋を分けて少しずつ慣らす、など）も短く添える。\n\n'
     +'# 相談者の回答（相談票）\n'+p+'\n\n# 判断原理（07）\n'+KB07+'\n\n# データ（00 横断比較表）\n'+KB00;
@@ -287,8 +301,9 @@ footer{margin-top:40px;font-size:12px;color:var(--muted);border-top:1px solid va
     try{
       var prof=profile(); var r=await sample(base+(extra?'\n\n# 追加の質問への答え\n'+extra:'')+'\n\n上の相談票に対して、相談者へのアドバイスを書いてください。',
         {onText:function(u){out.classList.remove('thinking');out.textContent=u.text; try{ var d=draftObj(); localStorage.setItem('shippo_draft',JSON.stringify(d)); }catch(e){} }});
-      document.getElementById('shop').hidden=false;
-      afterDone({profile:prof,followup:extra||'',answer:r.text,at:new Date().toISOString()}); stage='done'; clearDraft();
+      var rec={profile:prof,followup:extra||'',answer:r.text,at:new Date().toISOString(),form:snap()};
+      afterDone(rec); stage='done'; clearDraft();
+      getPicks(r.text).then(function(pk){ rec.picks=pk; showPicks(pk); try{ localStorage.setItem('shippo_last',JSON.stringify(rec)); }catch(e){} myDocP.then(function(doc){ if(doc) return doc('last').set({json:JSON.stringify(rec)}); }).catch(function(){}); });
     }catch(e){ out.classList.remove('thinking'); out.textContent=e.text||''; if(e.code!=='cancelled'){ var p=document.createElement('p'); p.className='err'; p.textContent=msg(e.code); out.append(document.createElement('br'),p);} }
     finally{ document.getElementById('go').disabled=false; if(document.getElementById('after').hidden){ document.getElementById('after').hidden=false; document.getElementById('copyBtn').hidden=!out.textContent; } }
   }
@@ -337,6 +352,27 @@ footer{margin-top:40px;font-size:12px;color:var(--muted);border-top:1px solid va
       var more=await askFollow(2); b.disabled=false; if(more.length){ showFollow(more); return; } }
     b.disabled=false; advise(qaAll);
   };
+  var ICON={
+    '犬':'<svg viewBox="0 0 80 80"><circle cx="40" cy="42" r="26" fill="var(--amber-soft)"/><ellipse cx="18" cy="36" rx="8" ry="15" fill="var(--amber)" transform="rotate(15 18 36)"/><ellipse cx="62" cy="36" rx="8" ry="15" fill="var(--amber)" transform="rotate(-15 62 36)"/><circle cx="31" cy="40" r="3" fill="var(--ink)"/><circle cx="49" cy="40" r="3" fill="var(--ink)"/><ellipse cx="40" cy="51" rx="5" ry="4" fill="var(--ink)"/><path d="M34 57q6 5 12 0" stroke="var(--ink)" stroke-width="2" fill="none" stroke-linecap="round"/></svg>',
+    '猫':'<svg viewBox="0 0 80 80"><path d="M16 30 L20 10 L34 22Z M64 30 L60 10 L46 22Z" fill="var(--accent)"/><circle cx="40" cy="44" r="26" fill="var(--accent-soft)"/><path d="M18 28 L21 13 L32 23Z M62 28 L59 13 L48 23Z" fill="var(--accent-soft)"/><circle cx="31" cy="42" r="3" fill="var(--ink)"/><circle cx="49" cy="42" r="3" fill="var(--ink)"/><path d="M37 50 h6 l-3 3z" fill="var(--amber)"/><path d="M40 53 q-4 4 -8 2 M40 53 q4 4 8 2" stroke="var(--ink)" stroke-width="1.6" fill="none" stroke-linecap="round"/><path d="M14 47h12M14 52h12M54 47h12M54 52h12" stroke="var(--muted)" stroke-width="1.2"/></svg>',
+    '小鳥':'<svg viewBox="0 0 80 80"><ellipse cx="40" cy="46" rx="22" ry="20" fill="var(--accent-soft)"/><circle cx="40" cy="30" r="14" fill="var(--accent-soft)"/><ellipse cx="48" cy="48" rx="10" ry="7" fill="var(--accent)" opacity=".6"/><circle cx="35" cy="28" r="2.6" fill="var(--ink)"/><path d="M44 30 l8 3 -8 3z" fill="var(--amber)"/><circle cx="31" cy="34" r="3" fill="#f2a7a0" opacity=".7"/><path d="M34 66 v6 M46 66 v6" stroke="var(--amber)" stroke-width="2" stroke-linecap="round"/></svg>',
+    'ハムスター':'<svg viewBox="0 0 80 80"><circle cx="22" cy="26" r="8" fill="var(--amber)"/><circle cx="58" cy="26" r="8" fill="var(--amber)"/><ellipse cx="40" cy="46" rx="27" ry="24" fill="var(--amber-soft)"/><ellipse cx="40" cy="54" rx="15" ry="11" fill="var(--surface)"/><circle cx="31" cy="42" r="3" fill="var(--ink)"/><circle cx="49" cy="42" r="3" fill="var(--ink)"/><ellipse cx="40" cy="49" rx="3" ry="2" fill="#e58f8f"/><circle cx="26" cy="51" r="4" fill="#f2a7a0" opacity=".6"/><circle cx="54" cy="51" r="4" fill="#f2a7a0" opacity=".6"/></svg>',
+    'モルモット':'<svg viewBox="0 0 80 80"><ellipse cx="40" cy="46" rx="30" ry="22" fill="var(--amber-soft)"/><path d="M14 44 q8 -22 30 -18 q-6 10 -4 26 q-14 4 -26 -8z" fill="var(--amber)" opacity=".7"/><ellipse cx="22" cy="30" rx="6" ry="4" fill="var(--amber)"/><circle cx="30" cy="42" r="3" fill="var(--ink)"/><ellipse cx="18" cy="49" rx="3" ry="2" fill="#e58f8f"/></svg>',
+    'その他':'<svg viewBox="0 0 80 80"><circle cx="40" cy="44" r="12" fill="var(--accent-soft)"/><circle cx="22" cy="28" r="7" fill="var(--accent-soft)"/><circle cx="36" cy="20" r="7" fill="var(--accent-soft)"/><circle cx="50" cy="22" r="7" fill="var(--accent-soft)"/><circle cx="60" cy="32" r="7" fill="var(--accent-soft)"/></svg>'
+  };
+  async function getPicks(answer){
+    var sample=await samplePromise; if(!sample) return [];
+    try{ var r=await sample.json('次のアドバイスの中で、相談者に「候補として」勧めている動物や品種を、勧めている順に最大4つ挙げてください。外した、勧めないとしたものは入れない。noteは、そのアドバイスに書かれた特徴を15字以内で（書かれていないことは書かない）。JSONだけで答える: {"picks":[{"species":"犬|猫|小鳥|ハムスター|モルモット|その他","name":"品種名または動物名","note":"…"}]}\n\n# アドバイス\n'+answer,{modelTier:'quick',cache:false});
+      return (r&&Array.isArray(r.picks)?r.picks:[]).filter(function(x){return x&&x.name;}).slice(0,4); }catch(e){ return []; } }
+  function showPicks(list){ var box=document.getElementById('pickList'); box.innerHTML=''; var wrap=document.getElementById('shop');
+    if(!list||!list.length){ wrap.hidden=true; return; }
+    list.forEach(function(x){ var d=document.createElement('div'); d.className='pick';
+      var ic=document.createElement('div'); ic.innerHTML=ICON[x.species]||ICON['その他']; d.append(ic.firstChild);
+      var b=document.createElement('b'); b.textContent=String(x.name); var sp=document.createElement('span'); sp.textContent=String(x.note||'');
+      var bt=document.createElement('button'); bt.type='button'; bt.className='btn ghost'; bt.textContent='お店で見る（デモ）';
+      bt.onclick=function(){ var n=document.getElementById('shopNote'); n.textContent='試作版のため、お店のページにはまだつながっていません（「'+x.name+'」の子を探すページに進む予定です）。'; n.hidden=false; };
+      d.append(b,sp,bt); box.append(d); });
+    document.getElementById('shopNote').hidden=true; wrap.hidden=false; }
   var current=null;
   function showCtx(rec){ var d=document.getElementById('ctx'); if(!rec||!rec.profile){ d.hidden=true; return; } document.getElementById('ctxBody').textContent='【相談票】\n'+rec.profile+(rec.followup?'\n\n【追加の質問と答え】\n'+rec.followup:''); d.open=false; d.hidden=false; }
   function afterDone(rec){ current=rec; showCtx(rec); document.getElementById('after').hidden=false; document.getElementById('copyBtn').hidden=false; document.getElementById('copyAllBtn').hidden=false; document.getElementById('afterMsg').textContent='';
@@ -344,7 +380,7 @@ footer{margin-top:40px;font-size:12px;color:var(--muted);border-top:1px solid va
     last=rec; myDocP.then(function(doc){ if(doc) return doc('last').set({json:JSON.stringify(rec)}); }).catch(function(){});
     dbPromise.then(function(db){ document.getElementById('saveBtn').hidden=!db; }); }
   document.getElementById('lastBtn').onclick=function(){ if(!last) return; show('answer'); out.classList.remove('thinking','err'); out.textContent=last.answer;
-    current=last; showCtx(last); document.getElementById('after').hidden=false; document.getElementById('copyBtn').hidden=false; document.getElementById('copyAllBtn').hidden=false; document.getElementById('shop').hidden=false;
+    current=last; showCtx(last); document.getElementById('after').hidden=false; document.getElementById('copyBtn').hidden=false; document.getElementById('copyAllBtn').hidden=false; showPicks(last.picks||[]);
     dbPromise.then(function(db){ document.getElementById('saveBtn').hidden=!db; });
     document.getElementById('answer').scrollIntoView({behavior:'smooth',block:'start'}); };
   document.getElementById('copyAllBtn').onclick=function(){ var m=document.getElementById('afterMsg'); if(!current) return;
@@ -357,6 +393,7 @@ footer{margin-top:40px;font-size:12px;color:var(--muted);border-top:1px solid va
     try{ var db=await dbPromise; var u=await userP; var uid=u?await u.id():null; if(!db||!current||!uid) throw 0; var at=new Date().toISOString(); await db.doc('records/'+uid).collection('items').add({at:at,profile:current.profile,followup:current.followup||'',answer:current.answer}); await db.doc('records/'+uid).set({last:at});
       m.textContent='記録に残しました。'; b.hidden=true; }
     catch(e){ m.textContent='記録に残せませんでした。少し時間をおいて、もう一度お試しください。'; b.disabled=false; } };
+  document.getElementById('reuse').onclick=function(){ if(!current||!current.form){ document.getElementById('afterMsg').textContent='このアドバイスは前の版で作ったため、相談票を戻せません。お手数ですが、もう一度入力してください（次からは戻せます）。'; return; } fill(current.form); exMode(false); stage='form'; show(null); document.getElementById('f').scrollIntoView({behavior:'smooth'}); };
   document.getElementById('again').onclick=function(){ stage='form'; show(null); document.getElementById('f').scrollIntoView({behavior:'smooth'}); };
   document.getElementById('restart').onclick=function(){ fill({}); qaAll=''; round=0; stage='form'; clearDraft(); show(null); exMode(false); window.scrollTo({top:0,behavior:'smooth'}); };
   document.getElementById('fuList').addEventListener('input',function(){ saveDraft(); });
@@ -367,6 +404,5 @@ footer{margin-top:40px;font-size:12px;color:var(--muted);border-top:1px solid va
     if(d.stage==='followup'&&d.qs&&d.qs.length){ round=Math.max(0,round-1); stage='followup'; showFollow(d.qs); (d.fu||[]).forEach(function(v,i){ var t=document.getElementById('fu'+i); if(t) t.value=v; }); }
     else if(d.stage==='advising'){ advise(qaAll); }
     else { stage='form'; document.getElementById('f').scrollIntoView({behavior:'smooth'}); } };
-  document.getElementById('shopBtn').onclick=function(){ document.getElementById('shopNote').hidden=false; };
 })();
 </script>
