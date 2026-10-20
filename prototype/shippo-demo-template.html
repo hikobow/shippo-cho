@@ -2,94 +2,119 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@500;700&family=Noto+Sans+JP:wght@400;500;700&display=swap">
+<meta name="claude:viewport-fit-sides" content="cover">
 <style>
-/* 一列の相談票。上から順に答え、下で回答を受け取り、そのまま会話を続ける */
+/* 一列の相談票を、ひと続きの「カード」に分けて、上から順に答える。答えのあとに、お話しした動物のカードが並ぶ */
 :root{
-  --bg:#f5f7f4; --surface:#ffffff; --ink:#1e2a25; --muted:#5d6b64; --line:#d9e1dc;
-  --accent:#2f6b5a; --accent-ink:#ffffff; --accent-soft:#e3efe9; --amber:#a86d1a; --amber-soft:#f8eedd;
+  --bg:#faf7f0; --surface:#ffffff; --ink:#2b302c; --muted:#69716b; --line:#e7e1d4;
+  --accent:#3f6b52; --accent-ink:#ffffff; --accent-soft:#e6efe6; --sage:#8fb59a;
+  --coral:#d9705a; --coral-soft:#fbe7e0; --amber:#9a5c14; --amber-soft:#f8ecd8;
+  --draft-bg:#fff4d6; --draft-ink:#5a4300; --draft-line:#f0d58a;
   --display:"Zen Maru Gothic","Hiragino Maru Gothic ProN","Noto Sans JP",sans-serif;
   --body:"Noto Sans JP","Hiragino Sans","Yu Gothic",sans-serif;
+  --r-card:22px; --r-pill:999px;
 }
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
-  --bg:#141a17; --surface:#1c2420; --ink:#e7ede9; --muted:#9fb0a7; --line:#2f3b35;
-  --accent:#7cc3a9; --accent-ink:#10201a; --accent-soft:#22352d; --amber:#e3b062; --amber-soft:#3a2f1d; color-scheme:dark}}
+  --bg:#181c19; --surface:#222823; --ink:#ecefe9; --muted:#bcc4bd; --line:#333b34;
+  --accent:#8fc4a0; --accent-ink:#11201a; --accent-soft:#29392d; --sage:#5d8a6a;
+  --coral:#f0a28f; --coral-soft:#3c2924; --amber:#e6b26a; --amber-soft:#3a2f1d;
+  --draft-bg:#3a3115; --draft-ink:#f3e2b0; --draft-line:#6b5a26; color-scheme:dark}}
 :root[data-theme="dark"]{
-  --bg:#141a17; --surface:#1c2420; --ink:#e7ede9; --muted:#9fb0a7; --line:#2f3b35;
-  --accent:#7cc3a9; --accent-ink:#10201a; --accent-soft:#22352d; --amber:#e3b062; --amber-soft:#3a2f1d; color-scheme:dark}
+  --bg:#181c19; --surface:#222823; --ink:#ecefe9; --muted:#bcc4bd; --line:#333b34;
+  --accent:#8fc4a0; --accent-ink:#11201a; --accent-soft:#29392d; --sage:#5d8a6a;
+  --coral:#f0a28f; --coral-soft:#3c2924; --amber:#e6b26a; --amber-soft:#3a2f1d;
+  --draft-bg:#3a3115; --draft-ink:#f3e2b0; --draft-line:#6b5a26; color-scheme:dark}
 *{box-sizing:border-box}
-body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.75;padding-inline:16px;padding-block:0 48px}
-.wrap{max-width:680px;margin:0 auto}
-header{display:flex;align-items:center;justify-content:space-between;gap:12px;padding-block:20px 8px}
-.brand{font-family:var(--display);font-weight:700;font-size:24px;letter-spacing:.04em;color:var(--accent);display:flex;align-items:center;gap:8px}
-.brand svg{width:28px;height:28px}
-.chip{font-size:12px;padding:2px 10px;border-radius:999px;background:var(--amber-soft);color:var(--amber);letter-spacing:.05em;white-space:nowrap}
-.lead{color:var(--muted);margin:4px 0 20px;text-wrap:pretty}
-h2{font-family:var(--display);font-weight:700;font-size:19px;margin:0 0 4px;text-wrap:balance}
-.note{display:flex;gap:10px;align-items:center;flex-wrap:wrap;font-size:13px;color:var(--muted);background:var(--accent-soft);border-radius:10px;padding:8px 12px;margin-bottom:16px}
-.note button{margin-left:auto}
-.ctx{margin-bottom:12px}.ctx summary{cursor:pointer;font-size:14px;color:var(--muted);padding:6px 0}.ctxBody{white-space:pre-wrap;font-size:14px;line-height:1.7}
-.cf{margin:0;display:grid;gap:6px}.cf dt{font-size:12px;color:var(--muted);margin-top:6px}.cf dd{margin:0;font-size:15px;white-space:pre-wrap;word-break:break-word}
-.picks{margin:18px 0 6px}.picks h3{font-family:var(--display);font-size:16px;margin:0 0 10px}
-.pickList{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
-.pick{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:12px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:6px}
-.pick svg{width:72px;height:72px}
-.pick b{font-family:var(--display);font-size:15px}
-.pick span{font-size:12px;color:var(--muted);line-height:1.5}
-.pick button{margin-top:auto;font-size:13px;padding:6px 12px}
-.pickHint{font-size:12px;color:var(--muted);margin:8px 0 0}
-.savebar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:10px;font-size:13px;color:var(--muted)}
-.draft{background:#fff4d6;color:#5a4300;font-size:14px;border:1px solid #f0d58a}
-@media (prefers-color-scheme: dark){.draft{background:#3a3115;color:#f3e2b0;border-color:#6b5a26}}
-form{display:grid;gap:22px}
-fieldset{border:0;margin:0;padding:0;display:grid;gap:8px;min-width:0}
-legend{font-weight:700;font-size:15px;padding:0;margin-bottom:6px}
-legend small{font-weight:400;color:var(--muted);margin-left:6px}
+[hidden]{display:none!important}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.8;
+  padding-left:max(16px, env(safe-area-inset-left, 0px));padding-right:max(16px, env(safe-area-inset-right, 0px));padding-block:0 56px}
+.wrap{max-width:640px;margin:0 auto}
+header{display:flex;align-items:center;justify-content:space-between;gap:12px;padding-block:22px 4px}
+.brand{font-family:var(--display);font-weight:700;font-size:26px;letter-spacing:.06em;color:var(--accent);display:flex;align-items:center;gap:10px}
+.brand svg{width:40px;height:40px}
+.chip{font-size:12px;padding:3px 12px;border-radius:var(--r-pill);background:var(--coral-soft);color:var(--coral);letter-spacing:.06em;white-space:nowrap;font-weight:700}
+.lead{color:var(--muted);margin:6px 0 18px;text-wrap:pretty;font-size:15px}
+h2{font-family:var(--display);font-weight:700;font-size:21px;margin:0 0 4px;text-wrap:balance;display:flex;align-items:center;gap:10px}
+h2 .face{width:40px;height:40px;flex:none}
+.note{display:flex;gap:8px 10px;align-items:center;flex-wrap:wrap;font-size:14px;color:var(--muted);background:var(--accent-soft);border-radius:16px;padding:10px 14px;margin-bottom:14px}
+.note span{flex:1 1 200px;min-width:0}
+.draft{background:var(--draft-bg);color:var(--draft-ink);border:1px solid var(--draft-line)}
+form{display:grid;gap:18px}
+.group{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-card);padding:18px 16px 20px;display:grid;gap:22px}
+.gh{display:flex;align-items:center;gap:10px;font-family:var(--display);font-weight:700;font-size:18px;color:var(--ink)}
+.step{flex:none;width:30px;height:30px;border-radius:50%;background:var(--accent-soft);color:var(--accent);display:grid;place-items:center;font-size:15px;font-variant-numeric:tabular-nums}
+fieldset{border:0;margin:0;padding:0;display:grid;gap:10px;min-width:0}
+legend{font-weight:700;font-size:16px;padding:0;margin-bottom:8px}
+legend small,.sub small{font-weight:400;color:var(--muted);margin-left:6px;font-size:13px}
 .opts{display:flex;flex-wrap:wrap;gap:8px}
 .opts input{position:absolute;opacity:0;pointer-events:none}
-.opts label{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:6px 14px;cursor:pointer;font-size:14px;transition:background .15s,border-color .15s}
-.opts input:checked+label{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
-.opts input:focus-visible+label{outline:2px solid var(--accent);outline-offset:2px}
-input[type=text],textarea{width:100%;font:inherit;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:10px 12px}
-textarea{min-height:88px;resize:vertical}
-input[type=text]:focus,textarea:focus{outline:2px solid var(--accent);outline-offset:1px}
-.btn{font:inherit;font-weight:700;border:0;border-radius:12px;padding:12px 20px;background:var(--accent);color:var(--accent-ink);cursor:pointer}
+.opts label{display:inline-flex;align-items:center;gap:6px;min-height:44px;border:1.5px solid var(--line);background:var(--bg);border-radius:var(--r-pill);padding:8px 16px;cursor:pointer;font-size:15px;line-height:1.4;transition:background .15s,border-color .15s,transform .1s}
+.opts label:active{transform:scale(.97)}
+.opts input:checked+label{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);font-weight:700}
+.opts input:checked+label::before{content:"";width:8px;height:8px;border-radius:50%;background:currentColor}
+.opts input:focus-visible+label{outline:2px solid var(--coral);outline-offset:2px}
+input[type=text],textarea{width:100%;font:inherit;font-size:16px;color:var(--ink);background:var(--bg);border:1.5px solid var(--line);border-radius:14px;padding:11px 14px}
+input[type=text]::placeholder,textarea::placeholder{color:var(--muted);opacity:.85}
+textarea{min-height:110px;resize:vertical}
+input[type=text]:focus,textarea:focus{outline:2px solid var(--accent);outline-offset:1px;border-color:transparent}
+.btn{font:inherit;font-weight:700;border:0;border-radius:var(--r-pill);padding:14px 26px;background:var(--accent);color:var(--accent-ink);cursor:pointer;font-size:16px}
 .btn:disabled{opacity:.5;cursor:default}
-.btn.ghost{background:transparent;color:var(--accent);border:1px solid var(--accent);font-weight:500;padding:6px 12px;font-size:13px;border-radius:999px}
-.btn:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
-.actions{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
-.card{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:20px}
-.bubble{white-space:pre-wrap;text-wrap:pretty}
+.btn.ghost{background:transparent;color:var(--accent);border:1.5px solid var(--accent);font-weight:500;padding:8px 14px;font-size:14px}
+.btn:focus-visible{outline:2px solid var(--coral);outline-offset:2px}
+.actions{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.send{display:grid;gap:10px;justify-items:center;text-align:center;padding-top:4px}
+.send .btn{width:100%;max-width:360px;font-size:17px;padding:16px 26px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-card);padding:20px}
+.bubble{white-space:pre-wrap;text-wrap:pretty;line-height:1.95}
+.answerCard{position:relative;border-color:var(--sage)}
 .thinking{color:var(--muted)}
-.who{font-size:12px;color:var(--muted);margin-bottom:4px;letter-spacing:.05em}
-.shop{display:flex;gap:12px;align-items:center;flex-wrap:wrap;border:1px dashed var(--line);border-radius:12px;padding:12px 14px;font-size:14px}
-.shop p{margin:0;flex:1 1 220px;min-width:0}
 .fu{display:grid;gap:14px;margin-bottom:16px}
-.sub{margin:6px 0 2px;font-size:13px;color:var(--muted)}
-.fu label{font-weight:700;display:block;margin-bottom:6px}
-#followup,.err{color:var(--amber)}
-footer{margin-top:40px;font-size:12px;color:var(--muted);border-top:1px solid var(--line);padding-top:12px}
+.fu>div{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:14px}
+.sub{margin:4px 0 2px;font-size:14px;color:var(--muted)}
+.fu label{font-weight:700;display:block;margin-bottom:8px;line-height:1.6}
+section{display:grid;gap:12px;margin-top:28px}
+.err{color:var(--amber)}
+#fuLead{color:var(--muted)}
+.ctx summary{cursor:pointer;font-size:14px;color:var(--muted);padding:4px 0}
+.ctxBody{white-space:pre-wrap;font-size:14px;line-height:1.7}
+.cf{margin:0;display:grid;gap:4px}.cf dt{font-size:12px;color:var(--muted);margin-top:8px}.cf dt:first-child{margin-top:0}.cf dd{margin:0;font-size:15px;white-space:pre-wrap;word-break:break-word}
+.savebar{display:flex;gap:8px 10px;align-items:center;justify-content:center;flex-wrap:wrap;font-size:13px;color:var(--muted);text-align:center}
+.picks{margin:6px 0 0}.picks h3{font-family:var(--display);font-size:17px;margin:0 0 10px}
+.pickList{display:grid;grid-template-columns:repeat(auto-fill,minmax(148px,1fr));gap:10px}
+.pick{background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:14px 12px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:6px}
+.pick svg{width:76px;height:76px}
+.pick b{font-family:var(--display);font-size:16px}
+.pick span{font-size:12px;color:var(--muted);line-height:1.5}
+.pick button{margin-top:auto;font-size:13px;padding:7px 12px;white-space:nowrap}
+.lastLink{margin-top:36px;display:flex;justify-content:center}
+.pickHint{font-size:12px;color:var(--muted);margin:8px 0 0}
+footer{margin-top:44px;font-size:12px;color:var(--muted);border-top:1px dashed var(--line);padding-top:14px;line-height:1.7}
 @media (prefers-reduced-motion: reduce){*{transition:none!important}}
 </style>
 
 <div class="wrap">
 <header>
-  <div class="brand"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M6 24c4 1 9-1 11-6 2-5 6-7 10-6" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><circle cx="25" cy="9" r="2.5" fill="currentColor"/></svg>しっぽ帳</div>
+  <div class="brand"><svg viewBox="0 0 48 48" aria-hidden="true"><circle cx="20" cy="27" r="15" fill="var(--accent-soft)"/><path d="M33 33c6-1 10-6 9-12-1-4-5-5-7-2" fill="none" stroke="var(--coral)" stroke-width="3.4" stroke-linecap="round"/><path d="M8 16l3-9 7 6M32 16l-3-9-7 6" fill="var(--accent-soft)"/><circle cx="15" cy="26" r="2" fill="var(--ink)"/><circle cx="25" cy="26" r="2" fill="var(--ink)"/><path d="M18 31q2 2 4 0" stroke="var(--ink)" stroke-width="1.6" fill="none" stroke-linecap="round"/><circle cx="12" cy="30" r="2.2" fill="var(--coral)" opacity=".45"/><circle cx="28" cy="30" r="2.2" fill="var(--coral)" opacity=".45"/></svg>しっぽ帳</div>
   <span class="chip">試作版</span>
 </header>
 <p class="lead">迎えたい動物と、いまの暮らしを教えてください。必要なら、こちらからいくつか確認の質問をします。そのうえで、獣医師の経験をもとにした考え方で、あなたの暮らしに合う迎え方をアドバイスします。</p>
 
 <div class="note draft" id="draftNote" hidden><span id="draftMsg">前回の相談が途中で残っています。</span><button type="button" class="btn ghost" id="draftGo">続きから</button><button type="button" class="btn ghost" id="draftNew" style="margin-left:0">新しく始める</button></div>
-<div class="note" id="lastNote" hidden><span>前回のアドバイスが残っています。</span><button type="button" class="btn ghost" id="lastBtn">前回のアドバイスを見る</button></div>
-<div class="note" id="exampleNote"><span id="exMsg">書き込み欄の薄い字は記入例です。入力すると消えます。</span><button type="button" class="btn ghost" id="exBtn">記入例をまとめて入れてみる</button><button type="button" class="btn ghost" id="clearBtn" hidden style="margin-left:0">入力を消す</button></div>
+
+<div class="note" id="exampleNote" hidden><span id="exMsg">書き込み欄の薄い字は記入例です。入力すると消えます。</span><button type="button" class="btn ghost" id="exBtn">記入例をまとめて入れてみる</button><button type="button" class="btn ghost" id="clearBtn" hidden style="margin-left:0">入力を消す</button></div>
 
 <form id="f" novalidate>
+  <div class="group"><div class="gh"><span class="step">1</span>どんな子を迎えたいですか</div>
   <fieldset><legend>迎えたい動物</legend><div class="opts" data-name="animal" data-type="radio">
     <span>犬</span><span>猫</span><span>小鳥</span><span>ハムスター</span><span>モルモット</span><span>その他の動物</span><span>まだ決めていない</span></div>
+    <div id="sizeWrap" hidden><p class="sub">大きさ（決まっていれば）<small>大きさは目安です。犬種や個体によって差があります</small></p><div class="opts" id="sizeBox" data-name="dogSize" data-type="radio"><span>小型犬</span><span>中型犬</span><span>大型犬</span><span>まだ決めていない</span></div></div>
     <div id="breedWrap" hidden><p class="sub" id="breedLabel">種類</p><div class="opts" id="breedBox" data-name="breedPick" data-type="radio"></div></div>
     <input type="text" id="breed" hidden placeholder="種類を書いてください">
   </fieldset>
   <fieldset><legend>その動物への思い</legend><div class="opts" data-name="wish" data-type="radio">
     <span>どうしてもこの動物がいい</span><span>できればこの動物がいい</span><span>なんとなく考えている</span></div></fieldset>
+  </div>
+  <div class="group"><div class="gh"><span class="step">2</span>あなたのこと</div>
   <fieldset><legend>あなたの年代</legend><div class="opts" data-name="age" data-type="radio">
     <span>20代以下</span><span>30代</span><span>40代</span><span>50代</span><span>60代</span><span>70代以上</span></div></fieldset>
   <fieldset><legend>あなたの性別<small>答えなくても大丈夫です</small></legend><div class="opts" data-name="sex" data-type="radio">
@@ -98,11 +123,13 @@ footer{margin-top:40px;font-size:12px;color:var(--muted);border-top:1px solid va
     <span>一人暮らし</span><span>配偶者・パートナー</span><span>子ども</span><span>親</span><span>その他</span></div>
     <input type="text" id="familyNote" placeholder="子どもの年齢など（例: 中学生の娘1人）">
   </fieldset>
+  </div>
+  <div class="group"><div class="gh"><span class="step">3</span>住まいと毎日の暮らし</div>
   <fieldset><legend>住まい</legend><div class="opts" data-name="home" data-type="radio">
     <span>戸建て</span><span>マンション</span><span>アパート</span><span>その他</span></div>
     <input type="text" id="rule" placeholder="飼える動物の決まり（例: 小型犬1匹まで）">
   </fieldset>
-  <fieldset><legend>平日の日中、家族はどう過ごしていますか<small>複数選べます</small></legend><div class="opts" data-name="daytime" data-type="checkbox">
+  <fieldset><legend><span id="dayLegend">平日の日中、家族はどう過ごしていますか</span><small>複数選べます</small></legend><div class="opts" data-name="daytime" data-type="checkbox">
     <span>家にいる（仕事はしていない）</span><span>在宅勤務（仕事中は手が離せない）</span><span>外で仕事・学校</span><span>パート・時短勤務</span><span>日によって違う</span></div>
     <input type="text" id="daytimeNote" placeholder="補足があれば（例: 妻は週3日在宅勤務、会議が多い）">
   </fieldset>
@@ -114,6 +141,8 @@ footer{margin-top:40px;font-size:12px;color:var(--muted);border-top:1px solid va
   </fieldset>
   <fieldset><legend>泊まりがけの外出（旅行・出張・帰省など）</legend><div class="opts" data-name="trip" data-type="radio">
     <span>ほとんどない</span><span>年に1〜2回</span><span>年に3〜6回</span><span>月に1回くらい</span><span>月に2回以上</span></div></fieldset>
+  </div>
+  <div class="group"><div class="gh"><span class="step">4</span>これまでと、これから</div>
   <fieldset><legend>動物を飼った経験</legend><div class="opts" data-name="exp" data-type="radio">
     <span>自分で飼ったことがある</span><span>家族が飼っていた</span><span>ない</span></div>
     <div id="expWrap" hidden><p class="sub">飼っていた動物<small>複数選べます</small></p><div class="opts" data-name="expAnimal" data-type="checkbox">
@@ -123,15 +152,19 @@ footer{margin-top:40px;font-size:12px;color:var(--muted);border-top:1px solid va
     <span>ない</span><span>ある・疑いがある</span><span>分からない</span></div></fieldset>
   <fieldset><legend>これからの予定<small>複数選べます</small></legend><div class="opts" data-name="future" data-type="checkbox">
     <span>転勤</span><span>引っ越し・住み替え</span><span>結婚</span><span>妊娠・出産</span><span>子どもの独立</span><span>介護</span><span>特にない</span></div></fieldset>
-  <fieldset><legend><label for="free">相談したいこと</label></legend>
+  </div>
+  <div class="group"><div class="gh"><span class="step">5</span>相談したいこと</div>
+  <fieldset><legend><label for="free">気になっていること、迷っていること</label></legend>
     <textarea id="free" placeholder="気になっていること、迷っていることを自由に（例: 本当は大型犬に憧れていますが、マンションの決まりで小型犬しか飼えません。どんな犬が合いますか？）"></textarea></fieldset>
-  <div class="actions"><button class="btn" id="go" type="submit">アドバイスを受け取る</button><span class="err" id="formErr" role="status"></span></div>
-  <div class="savebar"><button class="btn ghost" id="saveForm" type="button">💾 ここまで保存する</button><span class="saveStat" role="status">書いた内容は自動でも保存されます。閉じても、次に開いたときに続きから書けます。</span></div>
+  </div>
+  <div class="send"><button class="btn" id="go" type="submit">アドバイスを受け取る</button><span class="err" id="formErr" role="status"></span></div>
+  <div class="savebar"><button class="btn ghost" id="saveForm" type="button">ここまで保存する</button><span class="saveStat" role="status">書いた内容は自動でも保存されます。閉じても、次に開いたときに続きから書けます。</span></div>
 </form>
 
 <section id="confirm" hidden aria-live="polite">
   <h2>この内容で相談しますか？</h2>
   <p class="lead">書いた内容をもう一度ご確認ください。違うところがあれば「直す」を押してください。</p>
+  <p class="note draft" id="cfWarn" hidden></p>
   <div class="card"><dl id="cfList" class="cf"></dl></div>
   <div class="actions"><button class="btn" id="cfGo" type="button">この内容で相談する</button><button class="btn ghost" id="cfBack" type="button">直す</button></div>
 </section>
@@ -141,13 +174,13 @@ footer{margin-top:40px;font-size:12px;color:var(--muted);border-top:1px solid va
   <p class="lead" id="fuLead">アドバイスの前に、いくつか確認させてください。分からないものは空欄のままで大丈夫です。</p>
   <div id="fuList" class="fu"></div>
   <div class="actions"><button class="btn" id="fuGo" type="button">答えてアドバイスを受け取る</button></div>
-  <div class="savebar"><button class="btn ghost" id="saveFu" type="button">💾 ここまで保存する</button><span class="saveStat" role="status">答えは自動でも保存されます。</span></div>
+  <div class="savebar"><button class="btn ghost" id="saveFu" type="button">ここまで保存する</button><span class="saveStat" role="status">答えは自動でも保存されます。</span></div>
 </section>
 
 <section id="answer" hidden aria-live="polite">
-  <h2>しっぽ帳からのアドバイス</h2>
+  <h2><svg class="face" viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="26" r="17" fill="var(--accent-soft)"/><path d="M10 15l3-9 7 6M38 15l-3-9-7 6" fill="var(--accent-soft)"/><circle cx="18" cy="25" r="2.2" fill="var(--ink)"/><circle cx="30" cy="25" r="2.2" fill="var(--ink)"/><path d="M21 31q3 3 6 0" stroke="var(--ink)" stroke-width="1.8" fill="none" stroke-linecap="round"/><circle cx="14" cy="30" r="2.4" fill="var(--coral)" opacity=".45"/><circle cx="34" cy="30" r="2.4" fill="var(--coral)" opacity=".45"/></svg>しっぽ帳からのアドバイス</h2>
   <details id="ctx" class="ctx" hidden><summary>この相談の内容（相談票と質問への答え）を見る</summary><div class="card"><div id="ctxBody" class="ctxBody"></div></div></details>
-  <div class="card"><div class="bubble" id="out"></div></div>
+  <div class="card answerCard"><div class="bubble" id="out"></div></div>
   <div class="picks" id="shop" hidden>
     <h3>この相談でお話しした動物</h3>
     <div id="pickList" class="pickList"></div>
@@ -165,6 +198,7 @@ footer{margin-top:40px;font-size:12px;color:var(--muted);border-top:1px solid va
   <p class="lead" id="afterMsg" role="status"></p>
 </section>
 
+<div class="lastLink" id="lastNote" hidden><button type="button" class="btn ghost" id="lastBtn">前回のアドバイスを見る</button></div>
 <footer>しっぽ帳は、動物を迎えるかどうかを決めるものではなく、考えるためのアドバイスです。最終的な判断はご家族で、また健康のことはかかりつけの獣医師にご相談ください。<br>試作版: 回答はAIが作成します。書きかけの相談票と直前のアドバイスは、あなた専用の場所に保存され、次に開いたときに続きから使えます（ほかの人には見えません）。「記録に残す」を押した場合だけ、相談票とアドバイスが検証用に保存されます。</footer>
 </div>
 
@@ -190,31 +224,43 @@ footer{margin-top:40px;font-size:12px;color:var(--muted);border-top:1px solid va
     'ハムスター':['ゴールデン','キンクマ','ジャンガリアン','ロボロフスキー','キャンベル','チャイニーズ'],
     'モルモット':[]
   };
+  // 犬の大きさの目安（ユキさんに確認待ち）。MIXはどの大きさにも出す
+  var DOG_SIZE={'小型犬':['トイプードル','チワワ','ミニチュアダックスフンド','ポメラニアン','ミニチュアシュナウザー','シーズー','パグ','ペキニーズ','ミニチュアピンシャー','ジャックラッセルテリア','MIX（ミックス犬）'],
+    '中型犬':['柴犬','フレンチブルドッグ','ウェルシュコーギー','ビーグル','シェットランド・シープドッグ','ボーダーコリー','MIX（ミックス犬）'],
+    '大型犬':['ゴールデンレトリバー','ラブラドールレトリバー','MIX（ミックス犬）'],'まだ決めていない':[]};
   var breedBox=document.getElementById('breedBox'), breedText=document.getElementById('breed');
+  function curSize(){ var c=document.querySelector('input[name="dogSize"]:checked'); return c?c.value:''; }
   function renderBreeds(animal, keep){
     var list=BREEDS[animal]; breedBox.innerHTML='';
     var wrap=document.getElementById('breedWrap');
+    var sw=document.getElementById('sizeWrap'); sw.hidden=(animal!=='犬');
+    if(animal!=='犬'){ document.querySelectorAll('input[name="dogSize"]').forEach(function(i){ i.checked=false; }); }
+    if(animal==='犬'){ var sz=curSize(); if(!sz||sz==='まだ決めていない'){ wrap.hidden=true; breedText.hidden=true; return; } list=DOG_SIZE[sz]||[]; }
     if(animal==='その他の動物'){ wrap.hidden=true; breedText.hidden=false; breedText.placeholder='動物の種類を書いてください'; return; }
     if(!list||animal==='まだ決めていない'){ wrap.hidden=true; breedText.hidden=true; return; }
-    document.getElementById('breedLabel').textContent=(animal==='犬'?'犬種':animal==='猫'?'猫種':'種類')+'（決まっていれば）';
+    document.getElementById('breedLabel').textContent=(animal==='犬'?curSize()+'の犬種':animal==='猫'?'猫種':'種類')+'（決まっていれば）';
     list.concat(['まだ決めていない','その他']).forEach(function(n){ var sp=document.createElement('span'); sp.textContent=n; breedBox.append(sp); });
     build(breedBox); wrap.hidden=false;
     breedBox.querySelectorAll('input').forEach(function(i){ i.checked=(i.value===keep); i.onchange=function(){ breedText.hidden=(i.value!=='その他'); if(!breedText.hidden){breedText.placeholder='種類を書いてください';} }; });
     breedText.hidden=(keep!=='その他');
   }
   document.querySelectorAll('input[name="animal"]').forEach(function(i){ i.addEventListener('change',function(){ breedText.value=''; renderBreeds(i.value,''); }); });
+  function dayLabel(){ var a=Array.from(document.querySelectorAll('input[name="family"]:checked')).map(function(i){return i.value;}); var solo=(a.length===1&&a[0]==='一人暮らし');
+    document.getElementById('dayLegend').textContent= solo ? '平日の日中、あなたはどう過ごしていますか' : '平日の日中、家族はどう過ごしていますか'; }
+  document.querySelectorAll('input[name="family"]').forEach(function(i){ i.addEventListener('change',dayLabel); });
+  document.querySelectorAll('input[name="dogSize"]').forEach(function(i){ i.addEventListener('change',function(){ breedText.value=''; renderBreeds('犬',''); }); });
   document.querySelectorAll('input[name="exp"]').forEach(function(i){ i.addEventListener('change',function(){ document.getElementById('expWrap').hidden=(i.value==='ない'); }); });
-  var EXAMPLE={animal:'犬',breedPick:'まだ決めていない',wish:'できればこの動物がいい',age:'40代',sex:'女性',family:['配偶者・パートナー','子ども'],home:'マンション',daytime:['外で仕事・学校','パート・時短勤務'],away:'6時間以内',pets:'いない',trip:'年に1〜2回',exp:'ない',allergy:'ない',future:['子どもの独立'],
+  var EXAMPLE={animal:'犬',dogSize:'小型犬',breedPick:'まだ決めていない',wish:'できればこの動物がいい',age:'40代',sex:'女性',family:['配偶者・パートナー','子ども'],home:'マンション',daytime:['外で仕事・学校','パート・時短勤務'],away:'6時間以内',pets:'いない',trip:'年に1〜2回',exp:'ない',allergy:'ない',future:['子どもの独立'],
     familyNote:'中学1年の娘', rule:'小型犬1匹まで', daytimeNote:'妻は週3日のパート', free:'本当は大型犬に憧れていますが、マンションの決まりで小型犬しか飼えません。家族で散歩やお出かけを楽しみたいです。どんな犬が合いますか？'};
-  var FIELDS=['animal','wish','age','sex','family','home','daytime','away','pets','trip','exp','expAnimal','allergy','future'];
+  var FIELDS=['animal','dogSize','wish','age','sex','family','home','daytime','away','pets','trip','exp','expAnimal','allergy','future'];
   function setVal(name,v){ document.querySelectorAll('input[name="'+name+'"]').forEach(function(i){ i.checked = Array.isArray(v)? v.indexOf(i.value)>=0 : i.value===v; }); }
   function fill(o){ FIELDS.forEach(function(k){setVal(k,o[k]||'');});
     ['breed','familyNote','rule','daytimeNote','petsNote','free'].forEach(function(id){ document.getElementById(id).value=o[id]||''; });
     renderBreeds(o.animal||'', o.breedPick||''); if(o.breedPick==='その他'){breedText.hidden=false;}
-    document.getElementById('expWrap').hidden=!(o.exp&&o.exp!=='ない'); }
+    document.getElementById('expWrap').hidden=!(o.exp&&o.exp!=='ない'); dayLabel(); }
   fill({});
   document.getElementById('clearBtn').onclick=function(){ fill({}); exMode(false); if(stage==='form') saveDraft(); };
-  function exMode(on){ document.getElementById('exMsg').textContent= on ? '記入例が入っています。あなたの内容に書き換えるか、「入力を消す」で空にしてください。' : '書き込み欄の薄い字は記入例です。入力すると消えます。'; document.getElementById('exBtn').hidden=on; document.getElementById('clearBtn').hidden=!on; document.getElementById('exampleNote').hidden=false; }
+  function exMode(on){ return; document.getElementById('exMsg').textContent= on ? '記入例が入っています。あなたの内容に書き換えるか、「入力を消す」で空にしてください。' : '書き込み欄の薄い字は記入例です。入力すると消えます。'; document.getElementById('exBtn').hidden=on; document.getElementById('clearBtn').hidden=!on; document.getElementById('exampleNote').hidden=false; }
   document.getElementById('exBtn').onclick=function(){ fill(EXAMPLE); exMode(true); };
   var last=null; try{ last=JSON.parse(localStorage.getItem('shippo_last')||'null'); }catch(e){ last=null; }
   if(last&&last.answer){ document.getElementById('lastNote').hidden=false; }
@@ -251,8 +297,8 @@ footer{margin-top:40px;font-size:12px;color:var(--muted);border-top:1px solid va
   function get(name){ var a=Array.from(document.querySelectorAll('input[name="'+name+'"]:checked')).map(function(i){return i.value}); return a.join('、')||'（未回答）'; }
   function profile(){
     var t=function(id){var v=document.getElementById(id).value.trim();return v||'（記入なし）';};
-    var bp=get('breedPick'); var breed=(bp==='その他'||get('animal')==='その他の動物')? t('breed') : bp;
-    return ['迎えたい動物: '+get('animal')+'（種類: '+breed+'）','その動物への思い: '+get('wish'),'相談者の年代: '+get('age'),'相談者の性別: '+(get('sex')==='（未回答）'?'答えなし':get('sex')),
+    var bp=(get('animal')==='犬'&&get('dogSize')==='まだ決めていない')?'まだ決めていない':get('breedPick'); var breed=(bp==='その他'||get('animal')==='その他の動物')? t('breed') : bp;
+    return ['迎えたい動物: '+get('animal')+'（'+(get('animal')==='犬'&&get('dogSize')!=='（未回答）'?'大きさ: '+get('dogSize')+'、':'')+'種類: '+breed+'）','その動物への思い: '+get('wish'),'相談者の年代: '+get('age'),'相談者の性別: '+(get('sex')==='（未回答）'?'答えなし':get('sex')),
       '一緒に暮らす人: '+get('family')+'（補足: '+t('familyNote')+'）','住まい: '+get('home')+'（飼える動物の決まり: '+t('rule')+'）',
       '平日の日中の過ごし方: '+get('daytime')+'（補足: '+t('daytimeNote')+'）','平日、家に誰もいない時間: '+get('away'),
       'いま一緒に暮らしている動物: '+get('pets')+'（補足: '+t('petsNote')+'）','泊まりがけの外出: '+get('trip'),
@@ -277,6 +323,10 @@ footer{margin-top:40px;font-size:12px;color:var(--muted);border-top:1px solid va
     +'- 思いが「なんとなく考えている」の相談で、ほかの動物も可能性として示す場合は、最初の段落で「ほかの動物も含めて、一緒に考えてみますね」のように一言添え、相談者が戸惑わないようにする。\n'
     +'- 住まいが戸建てで、飼える動物の決まりが（記入なし）のときは、決まりには触れない。\n'
     +'- 犬や猫を候補にするときは、判断原理P0の5のとおり、条件に合う品種を2〜3挙げ、それぞれ、その子と暮らす楽しさや魅力（性格など）をひとつと、お世話で気をつけることをひとつ、短く添える。深く掘り下げず、前向きに（「まだ決めていない」「なんとなく」の相談でも挙げる。データにある品種から選ぶ）。品種を挙げるときは、勧める候補だけを示し、外した品種を並べて外した理由を書かない（相談者が名前を挙げた品種が合わない場合は、その品種についてだけ伝える）。\n'
+    +'- MIX（ミックス犬）の大きさは、相談者が選んだ大きさを目安として扱い、成犬になったときの大きさは、親犬の情報がなければ分からないものとして書く。\n'
+    +'- 品種の欄の「まだ決めていない」は、候補が絞れていないので一緒に考えたいという意味。「その他」は、候補はあるが一覧にないという意味（書かれた種類を読む）。\n'
+    +'- 最後は、相談者に返事を求める問いかけ（「教えてください」など）で終わらず、次にできること（会いに行く、確かめておくこと）を示して終える。この画面には、アドバイスのあとに返事を書く場所がない。\n'
+    +'- 住まいの決まりに書かれていない動物を勧めるときは、その動物が飼えるか、管理会社や大家さんに確かめるよう一言添える（例: 決まりが「犬は不可」だけで、猫を勧める場合）。\n'
     +'- わざわざ扱わないことを断る一文（例:「ほかの動物のことは、ここでは触れません」）は書かない。\n'
     +'- 先住の動物がいる相談では、迎える場合の助け（データにある、先住の子を優先する、最初は部屋を分けて少しずつ慣らす、など）も短く添える。\n\n'
     +'# 相談者の回答（相談票）\n'+p+'\n\n# 判断原理（07）\n'+KB07+'\n\n# データ（00 横断比較表）\n'+KB00;
@@ -315,6 +365,9 @@ footer{margin-top:40px;font-size:12px;color:var(--muted);border-top:1px solid va
     err.textContent='';
     var box=document.getElementById('cfList'); box.innerHTML='';
     profile().split('\n').forEach(function(line){ var i=line.indexOf(': '); var dt=document.createElement('dt'); dt.textContent=line.slice(0,i); var dd=document.createElement('dd'); dd.textContent=line.slice(i+2).replace(/（補足: （記入なし））|（飼える動物の決まり: （記入なし））/g,''); box.append(dt,dd); });
+    var left=['familyNote','rule','daytimeNote','petsNote','free'].filter(function(id){ var v=document.getElementById(id).value.trim(); return v && v===EXAMPLE[id]; });
+    var w=document.getElementById('cfWarn'); w.hidden=!left.length;
+    if(left.length){ w.textContent='記入例の文が、そのまま残っているところがあります（'+left.map(function(id){return '「'+EXAMPLE[id].slice(0,14)+(EXAMPLE[id].length>14?'…':'')+'」';}).join('、')+'）。あなたのことと違う場合は、「直す」から書き換えてください。'; }
     show('confirm'); document.getElementById('confirm').scrollIntoView({behavior:'smooth',block:'start'});
   });
   document.getElementById('cfBack').onclick=function(){ show(null); document.getElementById('f').scrollIntoView({behavior:'smooth'}); };
@@ -339,7 +392,7 @@ footer{margin-top:40px;font-size:12px;color:var(--muted);border-top:1px solid va
   }
   function showFollow(list){
     qs=list; round++; stage='followup';
-    document.getElementById('fuLead').textContent= (round===1 ? 'アドバイスの前に、'+qs.length+'つだけ教えてください。分からないものは空欄のままで大丈夫です。' : 'ありがとうございます。最後に、もう'+qs.length+'つだけ教えてください。');
+    document.getElementById('fuLead').textContent= (round===1 ? 'アドバイスの前に、'+qs.length+'つだけ教えてください。意味が分かりにくい質問や、答えにくい質問は、空欄のままで大丈夫です。' : 'ありがとうございます。最後に、もう'+qs.length+'つだけ教えてください。答えにくいものは、空欄のままで大丈夫です。');
     var box=document.getElementById('fuList'); box.innerHTML='';
     qs.forEach(function(q,i){ var d=document.createElement('div'); var l=document.createElement('label'); l.htmlFor='fu'+i; l.textContent=q;
       var t=document.createElement('textarea'); t.id='fu'+i; t.rows=2; d.append(l,t); box.append(d); });
@@ -362,7 +415,7 @@ footer{margin-top:40px;font-size:12px;color:var(--muted);border-top:1px solid va
   };
   async function getPicks(answer){
     var sample=await samplePromise; if(!sample) return [];
-    try{ var r=await sample.json('次のアドバイスの中で、相談者に「候補として」勧めている動物や品種を、勧めている順に最大4つ挙げてください。外した、勧めないとしたものは入れない。noteは、そのアドバイスに書かれた特徴を15字以内で（書かれていないことは書かない）。JSONだけで答える: {"picks":[{"species":"犬|猫|小鳥|ハムスター|モルモット|その他","name":"品種名または動物名","note":"…"}]}\n\n# アドバイス\n'+answer,{modelTier:'quick',cache:false});
+    try{ var r=await sample.json('次のアドバイスの中で、相談者に「候補として」勧めている動物や品種を、勧めている順に最大4つ挙げてください。外した、勧めないとしたものは入れない。noteは、そのアドバイスに書かれた特徴を15字以内で、傾向と分かる言い方で（例: 「穏やかな子が多い」。書かれていないことは書かない）。JSONだけで答える: {"picks":[{"species":"犬|猫|小鳥|ハムスター|モルモット|その他","name":"品種名または動物名","note":"…"}]}\n\n# アドバイス\n'+answer,{modelTier:'quick',cache:false});
       return (r&&Array.isArray(r.picks)?r.picks:[]).filter(function(x){return x&&x.name;}).slice(0,4); }catch(e){ return []; } }
   function showPicks(list){ var box=document.getElementById('pickList'); box.innerHTML=''; var wrap=document.getElementById('shop');
     if(!list||!list.length){ wrap.hidden=true; return; }
@@ -379,7 +432,7 @@ footer{margin-top:40px;font-size:12px;color:var(--muted);border-top:1px solid va
     try{ localStorage.setItem('shippo_last',JSON.stringify(rec)); }catch(e){}
     last=rec; myDocP.then(function(doc){ if(doc) return doc('last').set({json:JSON.stringify(rec)}); }).catch(function(){});
     dbPromise.then(function(db){ document.getElementById('saveBtn').hidden=!db; }); }
-  document.getElementById('lastBtn').onclick=function(){ if(!last) return; show('answer'); out.classList.remove('thinking','err'); out.textContent=last.answer;
+  document.getElementById('lastBtn').onclick=function(){ if(!last) return; document.getElementById('lastNote').hidden=true; show('answer'); out.classList.remove('thinking','err'); out.textContent=last.answer;
     current=last; showCtx(last); document.getElementById('after').hidden=false; document.getElementById('copyBtn').hidden=false; document.getElementById('copyAllBtn').hidden=false; showPicks(last.picks||[]);
     dbPromise.then(function(db){ document.getElementById('saveBtn').hidden=!db; });
     document.getElementById('answer').scrollIntoView({behavior:'smooth',block:'start'}); };
