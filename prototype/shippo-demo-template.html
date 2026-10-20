@@ -87,6 +87,8 @@ section{display:grid;gap:12px;margin-top:28px}
 .pick span{font-size:12px;color:var(--muted);line-height:1.5}
 .pick button{margin-top:auto;font-size:13px;padding:7px 12px;white-space:nowrap}
 .lastLink{margin-top:36px;display:flex;justify-content:center}
+.optHead{flex-basis:100%;margin:8px 0 0;font-size:13px;color:var(--muted);font-weight:700}
+.optHead:first-child{margin-top:0}
 .pickHint{font-size:12px;color:var(--muted);margin:8px 0 0}
 footer{margin-top:44px;font-size:12px;color:var(--muted);border-top:1px dashed var(--line);padding-top:14px;line-height:1.7}
 @media (prefers-reduced-motion: reduce){*{transition:none!important}}
@@ -106,9 +108,10 @@ footer{margin-top:44px;font-size:12px;color:var(--muted);border-top:1px dashed v
 <form id="f" novalidate>
   <div class="group"><div class="gh"><span class="step">1</span>どんな子を迎えたいですか</div>
   <fieldset><legend>迎えたい動物</legend><div class="opts" data-name="animal" data-type="radio">
-    <span>犬</span><span>猫</span><span>小鳥</span><span>ハムスター</span><span>モルモット</span><span>その他の動物</span><span>まだ決めていない</span></div>
+    <span>犬</span><span>猫</span><span>小鳥</span><span>小動物</span><span>その他の動物</span><span>まだ決めていない</span></div>
     <div id="sizeWrap" hidden><p class="sub">大きさ（決まっていれば）<small>大きさは目安です。犬種や個体によって差があります</small></p><div class="opts" id="sizeBox" data-name="dogSize" data-type="radio"><span>小型犬</span><span>中型犬</span><span>大型犬</span><span>まだ決めていない</span></div></div>
     <div id="breedWrap" hidden><p class="sub" id="breedLabel">種類</p><div class="opts" id="breedBox" data-name="breedPick" data-type="radio"></div></div>
+    <div id="hamWrap" hidden><p class="sub">ハムスターの種類（決まっていれば）</p><div class="opts" id="hamBox" data-name="hamKind" data-type="radio"><span>ゴールデン</span><span>キンクマ</span><span>ジャンガリアン</span><span>ロボロフスキー</span><span>キャンベル</span><span>チャイニーズ</span><span>まだ決めていない</span></div></div>
     <input type="text" id="breed" hidden placeholder="種類を書いてください">
   </fieldset>
   <fieldset><legend>その動物への思い</legend><div class="opts" data-name="wish" data-type="radio">
@@ -146,7 +149,7 @@ footer{margin-top:44px;font-size:12px;color:var(--muted);border-top:1px dashed v
   <fieldset><legend>動物を飼った経験</legend><div class="opts" data-name="exp" data-type="radio">
     <span>自分で飼ったことがある</span><span>家族が飼っていた</span><span>ない</span></div>
     <div id="expWrap" hidden><p class="sub">飼っていた動物<small>複数選べます</small></p><div class="opts" data-name="expAnimal" data-type="checkbox">
-    <span>犬</span><span>猫</span><span>小鳥</span><span>ハムスター</span><span>モルモット</span><span>その他</span></div></div>
+    <span>犬</span><span>猫</span><span>小鳥</span><span>ハムスター</span><span>モルモット</span><span>ウサギ</span><span>フェレット</span><span>その他</span></div></div>
   </fieldset>
   <fieldset><legend>家族の動物アレルギー</legend><div class="opts" data-name="allergy" data-type="radio">
     <span>ない</span><span>ある・疑いがある</span><span>分からない</span></div></fieldset>
@@ -217,31 +220,32 @@ footer{margin-top:44px;font-size:12px;color:var(--muted);border-top:1px dashed v
     });
   }
   document.querySelectorAll('.opts').forEach(function(box){ if(box.id!=='breedBox') build(box); });
+  // 「#」で始まるものは、ボタンではなく小見出し
   var BREEDS={
-    '犬':['トイプードル','チワワ','ミニチュアダックスフンド','ポメラニアン','柴犬','フレンチブルドッグ','ミニチュアシュナウザー','シーズー','パグ','ペキニーズ','ミニチュアピンシャー','ジャックラッセルテリア','ウェルシュコーギー','ビーグル','シェットランド・シープドッグ','ボーダーコリー','ゴールデンレトリバー','ラブラドールレトリバー','MIX（ミックス犬）'],
-    '猫':['雑種（日本猫）','スコティッシュフォールド','マンチカン','ラグドール','アメリカンショートヘア','ブリティッシュショートヘア','ミヌエット','ノルウェージャンフォレストキャット','サイベリアン','ラガマフィン','メインクーン','ベンガル','ロシアンブルー','エキゾチックショートヘア','ペルシャ'],
-    '小鳥':['文鳥','セキセイインコ','ボタンインコ','コザクラインコ','オカメインコ'],
-    'ハムスター':['ゴールデン','キンクマ','ジャンガリアン','ロボロフスキー','キャンベル','チャイニーズ'],
-    'モルモット':[]
+    '猫':['#普通の大きさ・短毛','日本猫（雑種）','アメリカンショートヘア','ブリティッシュショートヘア','スコティッシュフォールド','マンチカン','ミヌエット','ロシアンブルー','エキゾチックショートヘア','ベンガル','アビシニアン','シャム','ジャパニーズボブテイル','アメリカンカール',
+      '#普通の大きさ・長毛','ペルシャ','ヒマラヤン','ソマリ','サイベリアン','ラガマフィン','#大きくなる（長毛）','ラグドール','ノルウェージャンフォレストキャット','メインクーン'],
+    '小鳥':['#小型','セキセイインコ','文鳥','ジュウシマツ','キンカチョウ','カナリア','#中型','オカメインコ','コザクラインコ','ボタンインコ'],
+    '小動物':['ウサギ','ハムスター','モルモット','フェレット']
   };
-  // 犬の大きさの目安（ユキさんに確認待ち）。MIXはどの大きさにも出す
-  var DOG_SIZE={'小型犬':['トイプードル','チワワ','ミニチュアダックスフンド','ポメラニアン','ミニチュアシュナウザー','シーズー','パグ','ペキニーズ','ミニチュアピンシャー','ジャックラッセルテリア','MIX（ミックス犬）'],
-    '中型犬':['柴犬','フレンチブルドッグ','ウェルシュコーギー','ビーグル','シェットランド・シープドッグ','ボーダーコリー','MIX（ミックス犬）'],
-    '大型犬':['ゴールデンレトリバー','ラブラドールレトリバー','MIX（ミックス犬）'],'まだ決めていない':[]};
+  // 犬の大きさ（飼育上の区分。ユキさん、2026-10-20）。MIXはどの大きさにも出す
+  var DOG_SIZE={'小型犬':['トイプードル','チワワ','ミニチュアダックスフンド','ポメラニアン','ミニチュアシュナウザー','シーズー','パグ','ペキニーズ','ミニチュアピンシャー','ジャックラッセルテリア','パピヨン','ビションフリーゼ','ボストンテリア','マルチーズ','ヨークシャーテリア','MIX（ミックス犬）'],
+    '中型犬':['柴犬','フレンチブルドッグ','ウェルシュコーギー','ビーグル','シェットランド・シープドッグ','ボーダーコリー','アメリカンコッカースパニエル','イングリッシュコッカースパニエル','イタリアングレーハウンド','ウエストハイランドホワイトテリア','キャバリア・キングチャールズ・スパニエル','スコティッシュテリア','日本スピッツ','MIX（ミックス犬）'],
+    '大型犬':['ゴールデンレトリバー','ラブラドールレトリバー','秋田犬','アイリッシュセッター','アフガンハウンド','イングリッシュセッター','エアデールテリア','グレートピレニーズ','シベリアンハスキー','ダルメシアン','ドーベルマン','バーニーズマウンテンドッグ','ボルゾイ','MIX（ミックス犬）'],'まだ決めていない':[]};
   var breedBox=document.getElementById('breedBox'), breedText=document.getElementById('breed');
+  function hamShow(on){ document.getElementById('hamWrap').hidden=!on; if(!on){ document.querySelectorAll('input[name="hamKind"]').forEach(function(i){ i.checked=false; }); } }
   function curSize(){ var c=document.querySelector('input[name="dogSize"]:checked'); return c?c.value:''; }
   function renderBreeds(animal, keep){
     var list=BREEDS[animal]; breedBox.innerHTML='';
     var wrap=document.getElementById('breedWrap');
-    var sw=document.getElementById('sizeWrap'); sw.hidden=(animal!=='犬');
+    var sw=document.getElementById('sizeWrap'); sw.hidden=(animal!=='犬'); hamShow(animal==='小動物'&&keep==='ハムスター');
     if(animal!=='犬'){ document.querySelectorAll('input[name="dogSize"]').forEach(function(i){ i.checked=false; }); }
     if(animal==='犬'){ var sz=curSize(); if(!sz||sz==='まだ決めていない'){ wrap.hidden=true; breedText.hidden=true; return; } list=DOG_SIZE[sz]||[]; }
     if(animal==='その他の動物'){ wrap.hidden=true; breedText.hidden=false; breedText.placeholder='動物の種類を書いてください'; return; }
     if(!list||animal==='まだ決めていない'){ wrap.hidden=true; breedText.hidden=true; return; }
-    document.getElementById('breedLabel').textContent=(animal==='犬'?curSize()+'の犬種':animal==='猫'?'猫種':'種類')+'（決まっていれば）';
-    list.concat(['まだ決めていない','その他']).forEach(function(n){ var sp=document.createElement('span'); sp.textContent=n; breedBox.append(sp); });
+    document.getElementById('breedLabel').textContent=(animal==='犬'?curSize()+'の犬種':animal==='猫'?'猫種':animal==='小動物'?'動物の種類':'種類')+'（決まっていれば）';
+    list.concat(['#','まだ決めていない','その他']).forEach(function(n){ if(n.charAt(0)==='#'){ var h=document.createElement('p'); h.className='optHead'; h.textContent=n.slice(1); breedBox.append(h); return; } var sp=document.createElement('span'); sp.textContent=n; breedBox.append(sp); });
     build(breedBox); wrap.hidden=false;
-    breedBox.querySelectorAll('input').forEach(function(i){ i.checked=(i.value===keep); i.onchange=function(){ breedText.hidden=(i.value!=='その他'); if(!breedText.hidden){breedText.placeholder='種類を書いてください';} }; });
+    breedBox.querySelectorAll('input').forEach(function(i){ i.checked=(i.value===keep); i.onchange=function(){ breedText.hidden=(i.value!=='その他'); if(!breedText.hidden){breedText.placeholder='種類を書いてください';} hamShow(animal==='小動物'&&i.value==='ハムスター'); }; });
     breedText.hidden=(keep!=='その他');
   }
   document.querySelectorAll('input[name="animal"]').forEach(function(i){ i.addEventListener('change',function(){ breedText.value=''; renderBreeds(i.value,''); }); });
@@ -252,7 +256,7 @@ footer{margin-top:44px;font-size:12px;color:var(--muted);border-top:1px dashed v
   document.querySelectorAll('input[name="exp"]').forEach(function(i){ i.addEventListener('change',function(){ document.getElementById('expWrap').hidden=(i.value==='ない'); }); });
   var EXAMPLE={animal:'犬',dogSize:'小型犬',breedPick:'まだ決めていない',wish:'できればこの動物がいい',age:'40代',sex:'女性',family:['配偶者・パートナー','子ども'],home:'マンション',daytime:['外で仕事・学校','パート・時短勤務'],away:'6時間以内',pets:'いない',trip:'年に1〜2回',exp:'ない',allergy:'ない',future:['子どもの独立'],
     familyNote:'中学1年の娘', rule:'小型犬1匹まで', daytimeNote:'妻は週3日のパート', free:'本当は大型犬に憧れていますが、マンションの決まりで小型犬しか飼えません。家族で散歩やお出かけを楽しみたいです。どんな犬が合いますか？'};
-  var FIELDS=['animal','dogSize','wish','age','sex','family','home','daytime','away','pets','trip','exp','expAnimal','allergy','future'];
+  var FIELDS=['animal','dogSize','hamKind','wish','age','sex','family','home','daytime','away','pets','trip','exp','expAnimal','allergy','future'];
   function setVal(name,v){ document.querySelectorAll('input[name="'+name+'"]').forEach(function(i){ i.checked = Array.isArray(v)? v.indexOf(i.value)>=0 : i.value===v; }); }
   function fill(o){ FIELDS.forEach(function(k){setVal(k,o[k]||'');});
     ['breed','familyNote','rule','daytimeNote','petsNote','free'].forEach(function(id){ document.getElementById(id).value=o[id]||''; });
@@ -297,7 +301,7 @@ footer{margin-top:44px;font-size:12px;color:var(--muted);border-top:1px dashed v
   function get(name){ var a=Array.from(document.querySelectorAll('input[name="'+name+'"]:checked')).map(function(i){return i.value}); return a.join('、')||'（未回答）'; }
   function profile(){
     var t=function(id){var v=document.getElementById(id).value.trim();return v||'（記入なし）';};
-    var bp=(get('animal')==='犬'&&get('dogSize')==='まだ決めていない')?'まだ決めていない':get('breedPick'); var breed=(bp==='その他'||get('animal')==='その他の動物')? t('breed') : bp;
+    var bp=(get('animal')==='犬'&&get('dogSize')==='まだ決めていない')?'まだ決めていない':get('breedPick'); if(bp==='ハムスター'&&get('hamKind')!=='（未回答）') bp='ハムスター（'+get('hamKind')+'）'; var breed=(bp==='その他'||get('animal')==='その他の動物')? t('breed') : bp;
     return ['迎えたい動物: '+get('animal')+'（'+(get('animal')==='犬'&&get('dogSize')!=='（未回答）'?'大きさ: '+get('dogSize')+'、':'')+'種類: '+breed+'）','その動物への思い: '+get('wish'),'相談者の年代: '+get('age'),'相談者の性別: '+(get('sex')==='（未回答）'?'答えなし':get('sex')),
       '一緒に暮らす人: '+get('family')+'（補足: '+t('familyNote')+'）','住まい: '+get('home')+'（飼える動物の決まり: '+t('rule')+'）',
       '平日の日中の過ごし方: '+get('daytime')+'（補足: '+t('daytimeNote')+'）','平日、家に誰もいない時間: '+get('away'),
