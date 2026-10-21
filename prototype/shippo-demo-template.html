@@ -92,6 +92,26 @@ section{display:grid;gap:12px;margin-top:28px}
 .pickHint{font-size:12px;color:var(--muted);margin:8px 0 0}
 footer{margin-top:44px;font-size:12px;color:var(--muted);border-top:1px dashed var(--line);padding-top:14px;line-height:1.7}
 @media (prefers-reduced-motion: reduce){*{transition:none!important}}
+.shopDemo{position:fixed;inset:0;z-index:50;background:var(--bg);overflow-y:auto;-webkit-overflow-scrolling:touch}
+.shopDemo .sdBar{position:sticky;top:0;background:#b4533f;color:#fff;font-size:12px;text-align:center;padding:6px 16px;z-index:2}
+.shopDemo .sdHead{background:#2f5640;color:#fff;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;gap:10px}
+.shopDemo .sdHead b{font-family:var(--display);font-size:18px}
+.shopDemo .sdHead button{background:transparent;color:#fff;border:1px solid rgba(255,255,255,.7);border-radius:999px;padding:6px 12px;font-size:13px}
+.shopDemo .sdTabs{display:flex;gap:8px;overflow-x:auto;padding:12px 16px;border-bottom:1px solid var(--line)}
+.shopDemo .sdTabs span{flex:none;font-size:13px;padding:6px 12px;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:var(--muted)}
+.shopDemo .sdTabs span.on{background:var(--accent);color:#fff;border-color:var(--accent)}
+.shopDemo .sdBody{max-width:560px;margin:0 auto;padding:16px}
+.shopDemo h2{font-family:var(--display);font-size:20px;margin:6px 0 4px}
+.shopDemo .sdLead{font-size:13px;color:var(--muted);margin:0 0 14px;line-height:1.7}
+.shopDemo .sdList{display:grid;grid-template-columns:1fr;gap:12px}
+.shopDemo .sdItem{display:flex;gap:12px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:12px}
+.shopDemo .sdItem svg{width:72px;height:72px;flex:none}
+.shopDemo .sdItem div{flex:1;font-size:13px;line-height:1.7}
+.shopDemo .sdItem b{font-size:15px;display:block}
+.shopDemo .sdItem button{font-size:12px;padding:7px 12px;margin-top:6px}
+.shopDemo .sdMsg{font-size:13px;color:var(--coral);min-height:1.4em;margin:10px 0}
+.shopDemo .sdInfo{margin-top:18px;background:var(--surface);border:1px dashed var(--line);border-radius:16px;padding:12px 14px;font-size:12px;color:var(--muted);line-height:1.8}
+.shopDemo .sdBack{display:block;margin:20px auto 32px}
 </style>
 
 <div class="wrap">
@@ -187,7 +207,7 @@ footer{margin-top:44px;font-size:12px;color:var(--muted);border-top:1px dashed v
   <div class="picks" id="shop" hidden>
     <h3>この相談でお話しした動物</h3>
     <div id="pickList" class="pickList"></div>
-    <p class="pickHint">絵の下のボタンから、お店でその子たちを見られます。</p>
+    <p class="pickHint">絵の下のボタンから、お店のページ（デモ）に進めます。</p>
     <p class="err" id="shopNote" hidden>試作版のため、お店のページにはまだつながっていません。</p>
   </div>
   <div class="actions" id="after" hidden>
@@ -203,6 +223,20 @@ footer{margin-top:44px;font-size:12px;color:var(--muted);border-top:1px dashed v
 
 <div class="lastLink" id="lastNote" hidden><button type="button" class="btn ghost" id="lastBtn">前回のアドバイスを見る</button></div>
 <footer>しっぽ帳は、動物を迎えるかどうかを決めるものではなく、考えるためのアドバイスです。最終的な判断はご家族で、また健康のことはかかりつけの獣医師にご相談ください。<br>試作版: 回答はAIが作成します。書きかけの相談票と直前のアドバイスは、あなた専用の場所に保存され、次に開いたときに続きから使えます（ほかの人には見えません）。「記録に残す」を押した場合だけ、相談票とアドバイスが検証用に保存されます。</footer>
+</div>
+
+<div class="shopDemo" id="shopDemo" hidden role="dialog" aria-label="デモのお店のページ">
+  <div class="sdBar">これはデモの画面です。実在のお店ではありません。</div>
+  <div class="sdHead"><b>ペットショップ（デモ）</b><button type="button" id="sdClose">しっぽ帳に戻る</button></div>
+  <div class="sdTabs" id="sdTabs"></div>
+  <div class="sdBody">
+    <h2 id="sdTitle"></h2>
+    <p class="sdLead">しっぽ帳でお話しした子たちを、お店で探せるようになる予定です。下の子たちは見本で、実際にはいません。</p>
+    <div class="sdList" id="sdList"></div>
+    <p class="sdMsg" id="sdMsg" aria-live="polite"></p>
+    <div class="sdInfo">お店の名前、住所、電話番号、営業時間、動物取扱業の登録の内容（登録番号、責任者の名前など）が、ここに入ります。<br>動物を買うときは、お店で動物を見ながら、飼い方などの説明を対面で受けます。</div>
+    <button type="button" class="btn ghost sdBack" id="sdBack">しっぽ帳に戻る</button>
+  </div>
 </div>
 
 <script type="text/plain" id="kb07">__KB07__</script>
@@ -317,7 +351,7 @@ footer{margin-top:44px;font-size:12px;color:var(--muted);border-top:1px dashed v
     +'- 判定ではなくアドバイス。相談者に語りかける、やさしい日本語で書く。見出し・箇条書き・記号の多用はせず、短い段落で。800〜1400字。\n'
     +'- 書き方はソフトに。「心配です」「お勧めしにくい」「〜が要ります」より、「〜しておくと安心です」「〜するとぐっと楽になります」「〜という方法もあります」のように、相談者が前向きに考えられる言い方を選ぶ。注意点は、責めずに、一緒に考える口調で伝える。\n'
     +'- 判断原理の番号（P0など）、「重み」「意向の型」などの内部の言葉、出典番号は、回答に書かない。\n'
-    +'- 費用の金額は書かない（大型犬は費用がかかる、程度はよい）。\n- 相談者の気持ちを、書かれていないことまで推測して決めつけない。\n'
+    +'- 費用の金額は書かない（大型犬は費用がかかる、程度はよい）。予算を聞かれたときも「お伝えできません」と断る言い方はしない。先に、何にどのくらい費用がかかるか（食事の量、予防、医療、トリミングなど）を言葉で伝えてから、動物病院やお店で目安を聞くよう案内する。\n- 相談者の気持ちを、書かれていないことまで推測して決めつけない。\n'
     +'- 書く前に心の中で、意向の型（決まり具合と思いの強さ）と、重み3の条件の照合を行い、その結果に沿って結論を決める（この過程は書かない）。\n'
     +'- 最初の段落で、相談の問いに答える。ただし最初の一文で「無理」「できません」「お勧めしにくい」と言い切らない。まず相談者の希望や気持ちを受け止め、そのうえで条件との関係を伝え、合わない場合も次の道とあわせて伝える。\n'
     +'- 希望の動物で条件が合わないところがあっても、条件を重ねただけで不向きとしない。まず、その動物のまま実現するために何が必要か（準備、迎える時期、支援）を示す。それでも難しい場合は、同じ動物の中で別の品種・迎え方を考える。別の動物は、その動物そのものが暮らしと合わない場合にだけ、可能性として示す。\n'
@@ -328,6 +362,8 @@ footer{margin-top:44px;font-size:12px;color:var(--muted);border-top:1px dashed v
     +'- 住まいが戸建てで、飼える動物の決まりが（記入なし）のときは、決まりには触れない。\n'
     +'- 犬や猫を候補にするときは、判断原理P0の5のとおり、条件に合う品種を2〜3挙げ、それぞれ、その子と暮らす楽しさや魅力（性格など）をひとつと、お世話で気をつけることをひとつ、短く添える。深く掘り下げず、前向きに（「まだ決めていない」「なんとなく」の相談でも挙げる。データにある品種から選ぶ）。品種を挙げるときは、勧める候補だけを示し、外した品種を並べて外した理由を書かない（相談者が名前を挙げた品種が合わない場合は、その品種についてだけ伝える）。\n'
     +'- MIX（ミックス犬）の大きさは、相談者が選んだ大きさを目安として扱い、成犬になったときの大きさは、親犬の情報がなければ分からないものとして書く。\n'
+    +'- 相談者を「あなた」と呼ばない。主語を省くか、「ご自身」と書く。\n- 「組み立てる」「〜しておくと無理がありません」のような、ぼんやりした言い方をしない。何をするかを具体的に書く（例: 毎日の散歩はご自身が中心になり、体調の悪い日や雨の日はご家族に代わってもらえるように決めておくと続けやすいです）。\n'
+    +'- 寿命は07 P5の目安を使う。大型犬は「12歳ぐらい」と書く。14〜15歳は例外的なので、ふつうは書かない。年齢を心配している相談者に「長くてもここまで」と伝えるときだけ使う。\n'
     +'- 品種の欄の「まだ決めていない」は、候補が絞れていないので一緒に考えたいという意味。「その他」は、候補はあるが一覧にないという意味（書かれた種類を読む）。\n'
     +'- 最後は、相談者に返事を求める問いかけ（「教えてください」など）で終わらず、次にできること（会いに行く、確かめておくこと）を示して終える。この画面には、アドバイスのあとに返事を書く場所がない。\n'
     +'- 住まいの決まりに書かれていない動物を勧めるときは、その動物が飼えるか、管理会社や大家さんに確かめるよう一言添える（例: 決まりが「犬は不可」だけで、猫を勧める場合）。\n'
@@ -421,13 +457,27 @@ footer{margin-top:44px;font-size:12px;color:var(--muted);border-top:1px dashed v
     var sample=await samplePromise; if(!sample) return [];
     try{ var r=await sample.json('次のアドバイスの中で、相談者に「候補として」勧めている動物や品種を、勧めている順に最大4つ挙げてください。外した、勧めないとしたものは入れない。noteは、そのアドバイスに書かれた特徴を15字以内で、傾向と分かる言い方で（例: 「穏やかな子が多い」。書かれていないことは書かない）。JSONだけで答える: {"picks":[{"species":"犬|猫|小鳥|ハムスター|モルモット|その他","name":"品種名または動物名","note":"…"}]}\n\n# アドバイス\n'+answer,{modelTier:'quick',cache:false});
       return (r&&Array.isArray(r.picks)?r.picks:[]).filter(function(x){return x&&x.name;}).slice(0,4); }catch(e){ return []; } }
+  var shopBackY=0;
+  function sdItems(x){ var sex=['男の子','女の子','女の子'], now=new Date(), out=[];
+    for(var i=0;i<3;i++){ var d=new Date(now.getFullYear(),now.getMonth()-(2+i),1); out.push({sex:sex[i],born:d.getFullYear()+'年'+(d.getMonth()+1)+'月生まれ'}); } return out; }
+  function openShop(x,list){ shopBackY=window.scrollY; var tabs=document.getElementById('sdTabs'); tabs.innerHTML='';
+    (list||[x]).forEach(function(y){ var t=document.createElement('span'); t.textContent=String(y.name); if(y===x) t.className='on'; t.onclick=function(){ openShop(y,list); }; tabs.append(t); });
+    document.getElementById('sdTitle').textContent=String(x.name)+'の子たち';
+    var box=document.getElementById('sdList'); box.innerHTML='';
+    sdItems(x).forEach(function(it,i){ var d=document.createElement('div'); d.className='sdItem'; var ic=document.createElement('div'); ic.innerHTML=ICON[x.species]||ICON['その他']; d.append(ic.firstChild);
+      var t=document.createElement('div'); var b=document.createElement('b'); b.textContent='見本 '+(i+1); t.append(b, document.createTextNode(it.sex+'・'+it.born)); var br=document.createElement('br'); t.append(br, document.createTextNode('値段や様子は、お店でご確認ください'));
+      var bt=document.createElement('button'); bt.type='button'; bt.className='btn ghost'; bt.textContent='見学を予約（デモ）'; bt.onclick=function(){ document.getElementById('sdMsg').textContent='デモのため、予約はできません。'; };
+      t.append(document.createElement('br'),bt); d.append(t); box.append(d); });
+    document.getElementById('sdMsg').textContent=''; var sd=document.getElementById('shopDemo'); sd.hidden=false; sd.scrollTop=0; document.body.style.overflow='hidden'; }
+  function closeShop(){ document.getElementById('shopDemo').hidden=true; document.body.style.overflow=''; window.scrollTo(0,shopBackY); }
+  document.getElementById('sdClose').onclick=closeShop; document.getElementById('sdBack').onclick=closeShop;
   function showPicks(list){ var box=document.getElementById('pickList'); box.innerHTML=''; var wrap=document.getElementById('shop');
     if(!list||!list.length){ wrap.hidden=true; return; }
     list.forEach(function(x){ var d=document.createElement('div'); d.className='pick';
       var ic=document.createElement('div'); ic.innerHTML=ICON[x.species]||ICON['その他']; d.append(ic.firstChild);
       var b=document.createElement('b'); b.textContent=String(x.name); var sp=document.createElement('span'); sp.textContent=String(x.note||'');
       var bt=document.createElement('button'); bt.type='button'; bt.className='btn ghost'; bt.textContent='お店で見る（デモ）';
-      bt.onclick=function(){ var n=document.getElementById('shopNote'); n.textContent='試作版のため、お店のページにはまだつながっていません（「'+x.name+'」の子を探すページに進む予定です）。'; n.hidden=false; };
+      bt.onclick=function(){ openShop(x,list); };
       d.append(b,sp,bt); box.append(d); });
     document.getElementById('shopNote').hidden=true; wrap.hidden=false; }
   var current=null;
