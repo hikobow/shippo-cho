@@ -85,7 +85,7 @@ section{display:grid;gap:12px;margin-top:28px}
 .pick svg{width:76px;height:76px}
 .pick b{font-family:var(--display);font-size:17px}
 .pick span{font-size:13px;color:var(--muted);line-height:1.5}
-.pick button{margin-top:auto;font-size:14px;padding:7px 12px;white-space:nowrap}
+.pick button,.pick .shopLink{margin-top:auto;font-size:14px;padding:7px 12px;white-space:nowrap;text-decoration:none;display:inline-block}
 .lastLink{margin-top:36px;display:flex;justify-content:center}
 .optHead{flex-basis:100%;margin:8px 0 0;font-size:14px;color:var(--muted);font-weight:700}
 .optHead:first-child{margin-top:0}
@@ -207,7 +207,7 @@ footer{margin-top:44px;font-size:13px;color:var(--muted);border-top:1px dashed v
   <div class="picks" id="shop" hidden>
     <h3>この相談でお話しした動物</h3>
     <div id="pickList" class="pickList"></div>
-    <p class="pickHint">絵の下のボタンから、お店のページ（デモ）に進めます。</p>
+    <p class="pickHint">絵の下のボタンから、お店のページが開きます（試作版のため、どの子からも同じページです）。</p>
     <p class="err" id="shopNote" hidden>試作版のため、お店のページにはまだつながっていません。</p>
   </div>
   <div class="actions" id="after" hidden>
@@ -462,6 +462,8 @@ footer{margin-top:44px;font-size:13px;color:var(--muted);border-top:1px dashed v
     var sample=await samplePromise; if(!sample) return [];
     try{ var r=await sample.json('次のアドバイスの中で、相談者に「候補として」勧めている動物や品種を、勧めている順に最大4つ挙げてください。外した、勧めないとしたものは入れない。noteは、そのアドバイスに書かれた特徴を15字以内で、傾向と分かる言い方で（例: 「穏やかな子が多い」。書かれていないことは書かない）。JSONだけで答える: {"picks":[{"species":"犬|猫|小鳥|ハムスター|モルモット|その他","name":"品種名または動物名","note":"…"}]}\n\n# アドバイス\n'+answer,{modelTier:'quick',cache:false});
       return (r&&Array.isArray(r.picks)?r.picks:[]).filter(function(x){return x&&x.name;}).slice(0,4); }catch(e){ return []; } }
+  // お店のページ（ユキさん指定、2026-10-21。広告の印 gad_*・shem は外した）。動物ごとには分けない
+  var SHOP_URL='https://www.pet-onelove.com/iphones/puppy/?pet_type=MIX&brand=&kind=32&hair=&sex=&keiro=&shop=&sort_price=0&free_word=&pet_no=';
   var shopBackY=0;
   function sdItems(x){ var sex=['男の子','女の子','女の子'], now=new Date(), out=[];
     for(var i=0;i<3;i++){ var d=new Date(now.getFullYear(),now.getMonth()-(2+i),1); out.push({sex:sex[i],born:d.getFullYear()+'年'+(d.getMonth()+1)+'月生まれ'}); } return out; }
@@ -481,8 +483,7 @@ footer{margin-top:44px;font-size:13px;color:var(--muted);border-top:1px dashed v
     list.forEach(function(x){ var d=document.createElement('div'); d.className='pick';
       var ic=document.createElement('div'); ic.innerHTML=ICON[x.species]||ICON['その他']; d.append(ic.firstChild);
       var b=document.createElement('b'); b.textContent=String(x.name); var sp=document.createElement('span'); sp.textContent=String(x.note||'');
-      var bt=document.createElement('button'); bt.type='button'; bt.className='btn ghost'; bt.textContent='お店で見る（デモ）';
-      bt.onclick=function(){ openShop(x,list); };
+      var bt=document.createElement('a'); bt.className='btn ghost shopLink'; bt.href=SHOP_URL; bt.target='_blank'; bt.rel='noopener'; bt.textContent='お店で見る';
       d.append(b,sp,bt); box.append(d); });
     document.getElementById('shopNote').hidden=true; wrap.hidden=false; }
   var current=null;
