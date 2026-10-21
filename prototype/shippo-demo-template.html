@@ -62,6 +62,9 @@ input[type=text]:focus,textarea:focus{outline:2px solid var(--accent);outline-of
 .btn.ghost{background:transparent;color:var(--accent);border:1.5px solid var(--accent);font-weight:500;padding:8px 14px;font-size:15px}
 .btn:focus-visible{outline:2px solid var(--coral);outline-offset:2px}
 .actions{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.actGroup{margin-top:22px}
+.actGroup+.actGroup{margin-top:26px;padding-top:18px;border-top:1px solid var(--line)}
+.actHead{font-size:14px;font-weight:700;color:var(--muted);margin:0 0 10px;letter-spacing:.04em}
 .send{display:grid;gap:10px;justify-items:center;text-align:center;padding-top:4px}
 .send .btn{width:100%;max-width:360px;font-size:18px;padding:16px 26px}
 .card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-card);padding:20px}
@@ -210,13 +213,17 @@ footer{margin-top:44px;font-size:13px;color:var(--muted);border-top:1px dashed v
     <p class="pickHint">絵の下のボタンから、お店のページが開きます（試作版のため、どの子からも同じページです）。</p>
     <p class="err" id="shopNote" hidden>試作版のため、お店のページにはまだつながっていません。</p>
   </div>
-  <div class="actions" id="after" hidden>
+  <div id="after" hidden>
+    <div class="actGroup" id="shareGroup"><p class="actHead">残す・共有する</p><div class="actions">
     <button class="btn ghost" id="copyBtn" type="button">アドバイスをコピー</button>
     <button class="btn ghost" id="copyAllBtn" type="button" hidden>相談票・質問・アドバイスをまとめてコピー</button>
     <button class="btn ghost" id="saveBtn" type="button" hidden>この相談を記録に残す（検証用）</button>
+    </div></div>
+    <div class="actGroup"><p class="actHead">相談し直す</p><div class="actions">
     <button class="btn ghost" id="again" type="button">相談票を書き直す</button>
     <button class="btn ghost" id="reuse" type="button">同じ相談票でもう一度相談する</button>
     <button class="btn ghost" id="restart" type="button">最初からやり直す</button>
+    </div></div>
   </div>
   <p class="lead" id="afterMsg" role="status"></p>
 </section>
@@ -465,6 +472,10 @@ footer{margin-top:44px;font-size:13px;color:var(--muted);border-top:1px dashed v
     var sample=await samplePromise; if(!sample) return [];
     try{ var r=await sample.json('次のアドバイスの中で、相談者に「候補として」勧めている動物や品種を、勧めている順に最大4つ挙げてください。外した、勧めないとしたものは入れない。noteは、そのアドバイスに書かれた特徴を15字以内で、傾向と分かる言い方で（例: 「穏やかな子が多い」。書かれていないことは書かない）。JSONだけで答える: {"picks":[{"species":"犬|猫|小鳥|ハムスター|モルモット|その他","name":"品種名または動物名","note":"…"}]}\n\n# アドバイス\n'+answer,{modelTier:'quick',cache:false});
       return (r&&Array.isArray(r.picks)?r.picks:[]).filter(function(x){return x&&x.name;}).slice(0,4); }catch(e){ return []; } }
+  // 「残す・共有する」のボタンを出すかどうか（ユキさん、2026-10-21）。
+  // 試作・改変のとき: true（出す）。外に出すとき: false（出さない）。
+  var SHOW_SHARE=true;
+  if(!SHOW_SHARE) document.getElementById('shareGroup').hidden=true;
   // お店のページ（ユキさん指定、2026-10-21。広告の印 gad_*・shem は外した）。動物ごとには分けない
   var SHOP_URL='https://www.pet-onelove.com/iphones/puppy/?pet_type=MIX&brand=&kind=32&hair=&sex=&keiro=&shop=&sort_price=0&free_word=&pet_no=';
   var shopBackY=0;
