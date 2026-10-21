@@ -26,91 +26,91 @@
   --draft-bg:#3a3115; --draft-ink:#f3e2b0; --draft-line:#6b5a26; color-scheme:dark}
 *{box-sizing:border-box}
 [hidden]{display:none!important}
-body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.8;
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.8;
   padding-left:max(16px, env(safe-area-inset-left, 0px));padding-right:max(16px, env(safe-area-inset-right, 0px));padding-block:0 56px}
 .wrap{max-width:640px;margin:0 auto}
 header{display:flex;align-items:center;justify-content:space-between;gap:12px;padding-block:22px 4px}
-.brand{font-family:var(--display);font-weight:700;font-size:26px;letter-spacing:.06em;color:var(--accent);display:flex;align-items:center;gap:10px}
-.brand svg{width:40px;height:40px}
-.chip{font-size:12px;padding:3px 12px;border-radius:var(--r-pill);background:var(--coral-soft);color:var(--coral);letter-spacing:.06em;white-space:nowrap;font-weight:700}
-.lead{color:var(--muted);margin:6px 0 18px;text-wrap:pretty;font-size:15px}
-h2{font-family:var(--display);font-weight:700;font-size:21px;margin:0 0 4px;text-wrap:balance;display:flex;align-items:center;gap:10px}
+.brand{font-family:var(--display);font-weight:700;font-size:27px;letter-spacing:.06em;color:var(--accent);display:flex;align-items:center;gap:10px}
+.brand svg{width:64px;height:64px;margin:-6px 0}
+.chip{font-size:13px;padding:3px 12px;border-radius:var(--r-pill);background:var(--coral-soft);color:var(--coral);letter-spacing:.06em;white-space:nowrap;font-weight:700}
+.lead{color:var(--muted);margin:6px 0 18px;text-wrap:pretty;font-size:16px}
+h2{font-family:var(--display);font-weight:700;font-size:22px;margin:0 0 4px;text-wrap:balance;display:flex;align-items:center;gap:10px}
 h2 .face{width:40px;height:40px;flex:none}
-.note{display:flex;gap:8px 10px;align-items:center;flex-wrap:wrap;font-size:14px;color:var(--muted);background:var(--accent-soft);border-radius:16px;padding:10px 14px;margin-bottom:14px}
+.note{display:flex;gap:8px 10px;align-items:center;flex-wrap:wrap;font-size:15px;color:var(--muted);background:var(--accent-soft);border-radius:16px;padding:10px 14px;margin-bottom:14px}
 .note span{flex:1 1 200px;min-width:0}
 .draft{background:var(--draft-bg);color:var(--draft-ink);border:1px solid var(--draft-line)}
 form{display:grid;gap:18px}
 .group{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-card);padding:18px 16px 20px;display:grid;gap:22px}
-.gh{display:flex;align-items:center;gap:10px;font-family:var(--display);font-weight:700;font-size:18px;color:var(--ink)}
-.step{flex:none;width:30px;height:30px;border-radius:50%;background:var(--accent-soft);color:var(--accent);display:grid;place-items:center;font-size:15px;font-variant-numeric:tabular-nums}
+.gh{display:flex;align-items:center;gap:10px;font-family:var(--display);font-weight:700;font-size:19px;color:var(--ink)}
+.step{flex:none;width:30px;height:30px;border-radius:50%;background:var(--accent-soft);color:var(--accent);display:grid;place-items:center;font-size:16px;font-variant-numeric:tabular-nums}
 fieldset{border:0;margin:0;padding:0;display:grid;gap:10px;min-width:0}
-legend{font-weight:700;font-size:16px;padding:0;margin-bottom:8px}
-legend small,.sub small{font-weight:400;color:var(--muted);margin-left:6px;font-size:13px}
+legend{font-weight:700;font-size:17px;padding:0;margin-bottom:8px}
+legend small,.sub small{font-weight:400;color:var(--muted);margin-left:6px;font-size:14px}
 .opts{display:flex;flex-wrap:wrap;gap:8px}
 .opts input{position:absolute;opacity:0;pointer-events:none}
-.opts label{display:inline-flex;align-items:center;gap:6px;min-height:44px;border:1.5px solid var(--line);background:var(--bg);border-radius:var(--r-pill);padding:8px 16px;cursor:pointer;font-size:15px;line-height:1.4;transition:background .15s,border-color .15s,transform .1s}
+.opts label{display:inline-flex;align-items:center;gap:6px;min-height:44px;border:1.5px solid var(--line);background:var(--bg);border-radius:var(--r-pill);padding:8px 16px;cursor:pointer;font-size:16px;line-height:1.4;transition:background .15s,border-color .15s,transform .1s}
 .opts label:active{transform:scale(.97)}
 .opts input:checked+label{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);font-weight:700}
 .opts input:checked+label::before{content:"";width:8px;height:8px;border-radius:50%;background:currentColor}
 .opts input:focus-visible+label{outline:2px solid var(--coral);outline-offset:2px}
-input[type=text],textarea{width:100%;font:inherit;font-size:16px;color:var(--ink);background:var(--bg);border:1.5px solid var(--line);border-radius:14px;padding:11px 14px}
+input[type=text],textarea{width:100%;font:inherit;font-size:17px;color:var(--ink);background:var(--bg);border:1.5px solid var(--line);border-radius:14px;padding:11px 14px}
 input[type=text]::placeholder,textarea::placeholder{color:var(--muted);opacity:.85}
 textarea{min-height:110px;resize:vertical}
 input[type=text]:focus,textarea:focus{outline:2px solid var(--accent);outline-offset:1px;border-color:transparent}
-.btn{font:inherit;font-weight:700;border:0;border-radius:var(--r-pill);padding:14px 26px;background:var(--accent);color:var(--accent-ink);cursor:pointer;font-size:16px}
+.btn{font:inherit;font-weight:700;border:0;border-radius:var(--r-pill);padding:14px 26px;background:var(--accent);color:var(--accent-ink);cursor:pointer;font-size:17px}
 .btn:disabled{opacity:.5;cursor:default}
-.btn.ghost{background:transparent;color:var(--accent);border:1.5px solid var(--accent);font-weight:500;padding:8px 14px;font-size:14px}
+.btn.ghost{background:transparent;color:var(--accent);border:1.5px solid var(--accent);font-weight:500;padding:8px 14px;font-size:15px}
 .btn:focus-visible{outline:2px solid var(--coral);outline-offset:2px}
 .actions{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
 .send{display:grid;gap:10px;justify-items:center;text-align:center;padding-top:4px}
-.send .btn{width:100%;max-width:360px;font-size:17px;padding:16px 26px}
+.send .btn{width:100%;max-width:360px;font-size:18px;padding:16px 26px}
 .card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-card);padding:20px}
 .bubble{white-space:pre-wrap;text-wrap:pretty;line-height:1.95}
 .answerCard{position:relative;border-color:var(--sage)}
 .thinking{color:var(--muted)}
 .fu{display:grid;gap:14px;margin-bottom:16px}
 .fu>div{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:14px}
-.sub{margin:4px 0 2px;font-size:14px;color:var(--muted)}
+.sub{margin:4px 0 2px;font-size:15px;color:var(--muted)}
 .fu label{font-weight:700;display:block;margin-bottom:8px;line-height:1.6}
 section{display:grid;gap:12px;margin-top:28px}
 .err{color:var(--amber)}
 #fuLead{color:var(--muted)}
-.ctx summary{cursor:pointer;font-size:14px;color:var(--muted);padding:4px 0}
-.ctxBody{white-space:pre-wrap;font-size:14px;line-height:1.7}
-.cf{margin:0;display:grid;gap:4px}.cf dt{font-size:12px;color:var(--muted);margin-top:8px}.cf dt:first-child{margin-top:0}.cf dd{margin:0;font-size:15px;white-space:pre-wrap;word-break:break-word}
-.savebar{display:flex;gap:8px 10px;align-items:center;justify-content:center;flex-wrap:wrap;font-size:13px;color:var(--muted);text-align:center}
-.picks{margin:6px 0 0}.picks h3{font-family:var(--display);font-size:17px;margin:0 0 10px}
+.ctx summary{cursor:pointer;font-size:15px;color:var(--muted);padding:4px 0}
+.ctxBody{white-space:pre-wrap;font-size:15px;line-height:1.7}
+.cf{margin:0;display:grid;gap:4px}.cf dt{font-size:13px;color:var(--muted);margin-top:8px}.cf dt:first-child{margin-top:0}.cf dd{margin:0;font-size:16px;white-space:pre-wrap;word-break:break-word}
+.savebar{display:flex;gap:8px 10px;align-items:center;justify-content:center;flex-wrap:wrap;font-size:14px;color:var(--muted);text-align:center}
+.picks{margin:6px 0 0}.picks h3{font-family:var(--display);font-size:18px;margin:0 0 10px}
 .pickList{display:grid;grid-template-columns:repeat(auto-fill,minmax(148px,1fr));gap:10px}
 .pick{background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:14px 12px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:6px}
 .pick svg{width:76px;height:76px}
-.pick b{font-family:var(--display);font-size:16px}
-.pick span{font-size:12px;color:var(--muted);line-height:1.5}
-.pick button{margin-top:auto;font-size:13px;padding:7px 12px;white-space:nowrap}
+.pick b{font-family:var(--display);font-size:17px}
+.pick span{font-size:13px;color:var(--muted);line-height:1.5}
+.pick button{margin-top:auto;font-size:14px;padding:7px 12px;white-space:nowrap}
 .lastLink{margin-top:36px;display:flex;justify-content:center}
-.optHead{flex-basis:100%;margin:8px 0 0;font-size:13px;color:var(--muted);font-weight:700}
+.optHead{flex-basis:100%;margin:8px 0 0;font-size:14px;color:var(--muted);font-weight:700}
 .optHead:first-child{margin-top:0}
-.pickHint{font-size:12px;color:var(--muted);margin:8px 0 0}
-footer{margin-top:44px;font-size:12px;color:var(--muted);border-top:1px dashed var(--line);padding-top:14px;line-height:1.7}
+.pickHint{font-size:13px;color:var(--muted);margin:8px 0 0}
+footer{margin-top:44px;font-size:13px;color:var(--muted);border-top:1px dashed var(--line);padding-top:14px;line-height:1.7}
 @media (prefers-reduced-motion: reduce){*{transition:none!important}}
 .shopDemo{position:fixed;inset:0;z-index:50;background:var(--bg);overflow-y:auto;-webkit-overflow-scrolling:touch}
-.shopDemo .sdBar{position:sticky;top:0;background:#b4533f;color:#fff;font-size:12px;text-align:center;padding:6px 16px;z-index:2}
+.shopDemo .sdBar{position:sticky;top:0;background:#b4533f;color:#fff;font-size:13px;text-align:center;padding:6px 16px;z-index:2}
 .shopDemo .sdHead{background:#2f5640;color:#fff;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;gap:10px}
-.shopDemo .sdHead b{font-family:var(--display);font-size:18px}
-.shopDemo .sdHead button{background:transparent;color:#fff;border:1px solid rgba(255,255,255,.7);border-radius:999px;padding:6px 12px;font-size:13px}
+.shopDemo .sdHead b{font-family:var(--display);font-size:19px}
+.shopDemo .sdHead button{background:transparent;color:#fff;border:1px solid rgba(255,255,255,.7);border-radius:999px;padding:6px 12px;font-size:14px}
 .shopDemo .sdTabs{display:flex;gap:8px;overflow-x:auto;padding:12px 16px;border-bottom:1px solid var(--line)}
-.shopDemo .sdTabs span{flex:none;font-size:13px;padding:6px 12px;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:var(--muted)}
+.shopDemo .sdTabs span{flex:none;font-size:14px;padding:6px 12px;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:var(--muted)}
 .shopDemo .sdTabs span.on{background:var(--accent);color:#fff;border-color:var(--accent)}
 .shopDemo .sdBody{max-width:560px;margin:0 auto;padding:16px}
-.shopDemo h2{font-family:var(--display);font-size:20px;margin:6px 0 4px}
-.shopDemo .sdLead{font-size:13px;color:var(--muted);margin:0 0 14px;line-height:1.7}
+.shopDemo h2{font-family:var(--display);font-size:21px;margin:6px 0 4px}
+.shopDemo .sdLead{font-size:14px;color:var(--muted);margin:0 0 14px;line-height:1.7}
 .shopDemo .sdList{display:grid;grid-template-columns:1fr;gap:12px}
 .shopDemo .sdItem{display:flex;gap:12px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:12px}
 .shopDemo .sdItem svg{width:72px;height:72px;flex:none}
-.shopDemo .sdItem div{flex:1;font-size:13px;line-height:1.7}
-.shopDemo .sdItem b{font-size:15px;display:block}
-.shopDemo .sdItem button{font-size:12px;padding:7px 12px;margin-top:6px}
-.shopDemo .sdMsg{font-size:13px;color:var(--coral);min-height:1.4em;margin:10px 0}
-.shopDemo .sdInfo{margin-top:18px;background:var(--surface);border:1px dashed var(--line);border-radius:16px;padding:12px 14px;font-size:12px;color:var(--muted);line-height:1.8}
+.shopDemo .sdItem div{flex:1;font-size:14px;line-height:1.7}
+.shopDemo .sdItem b{font-size:16px;display:block}
+.shopDemo .sdItem button{font-size:13px;padding:7px 12px;margin-top:6px}
+.shopDemo .sdMsg{font-size:14px;color:var(--coral);min-height:1.4em;margin:10px 0}
+.shopDemo .sdInfo{margin-top:18px;background:var(--surface);border:1px dashed var(--line);border-radius:16px;padding:12px 14px;font-size:13px;color:var(--muted);line-height:1.8}
 .shopDemo .sdBack{display:block;margin:20px auto 32px}
 </style>
 
@@ -156,7 +156,7 @@ footer{margin-top:44px;font-size:12px;color:var(--muted);border-top:1px dashed v
     <span>家にいる（仕事はしていない）</span><span>在宅勤務（仕事中は手が離せない）</span><span>外で仕事・学校</span><span>パート・時短勤務</span><span>日によって違う</span></div>
     <input type="text" id="daytimeNote" placeholder="補足があれば（例: 妻は週3日在宅勤務、会議が多い）">
   </fieldset>
-  <fieldset><legend>平日、家に誰もいない時間</legend><div class="opts" data-name="away" data-type="radio">
+  <fieldset><legend id="awayLegend">平日、家に誰もいない時間</legend><div class="opts" data-name="away" data-type="radio">
     <span>ほとんど誰かが家にいる</span><span>6時間以内</span><span>6時間超〜10時間以内</span><span>10時間超</span></div></fieldset>
   <fieldset><legend>いま一緒に暮らしている動物</legend><div class="opts" data-name="pets" data-type="radio">
     <span>いない</span><span>いる</span></div>
@@ -283,7 +283,10 @@ footer{margin-top:44px;font-size:12px;color:var(--muted);border-top:1px dashed v
     breedText.hidden=(keep!=='その他');
   }
   document.querySelectorAll('input[name="animal"]').forEach(function(i){ i.addEventListener('change',function(){ breedText.value=''; renderBreeds(i.value,''); }); });
-  function dayLabel(){ var a=Array.from(document.querySelectorAll('input[name="family"]:checked')).map(function(i){return i.value;}); var solo=(a.length===1&&a[0]==='一人暮らし');
+  function isSolo(){ var a=Array.from(document.querySelectorAll('input[name="family"]:checked')).map(function(i){return i.value;}); return (a.length===1&&a[0]==='一人暮らし'); }
+  function dayLabel(){ var solo=isSolo();
+    document.getElementById('awayLegend').textContent= solo ? '平日、家をあけている時間' : '平日、家に誰もいない時間';
+    var l0=document.querySelector('label[for="away_0"]'); if(l0) l0.textContent= solo ? 'ほとんど家にいる' : 'ほとんど誰かが家にいる';
     document.getElementById('dayLegend').textContent= solo ? '平日の日中、あなたはどう過ごしていますか' : '平日の日中、家族はどう過ごしていますか'; }
   document.querySelectorAll('input[name="family"]').forEach(function(i){ i.addEventListener('change',dayLabel); });
   document.querySelectorAll('input[name="dogSize"]').forEach(function(i){ i.addEventListener('change',function(){ breedText.value=''; renderBreeds('犬',''); }); });
@@ -338,7 +341,7 @@ footer{margin-top:44px;font-size:12px;color:var(--muted);border-top:1px dashed v
     var bp=(get('animal')==='犬'&&get('dogSize')==='まだ決めていない')?'まだ決めていない':get('breedPick'); if(bp==='ハムスター'&&get('hamKind')!=='（未回答）') bp='ハムスター（'+get('hamKind')+'）'; var breed=(bp==='その他'||get('animal')==='その他の動物')? t('breed') : bp;
     return ['迎えたい動物: '+get('animal')+'（'+(get('animal')==='犬'&&get('dogSize')!=='（未回答）'?'大きさ: '+get('dogSize')+'、':'')+'種類: '+breed+'）','その動物への思い: '+get('wish'),'相談者の年代: '+get('age'),'相談者の性別: '+(get('sex')==='（未回答）'?'答えなし':get('sex')),
       '一緒に暮らす人: '+get('family')+'（補足: '+t('familyNote')+'）','住まい: '+get('home')+'（飼える動物の決まり: '+t('rule')+'）',
-      '平日の日中の過ごし方: '+get('daytime')+'（補足: '+t('daytimeNote')+'）','平日、家に誰もいない時間: '+get('away'),
+      '平日の日中の過ごし方: '+get('daytime')+'（補足: '+t('daytimeNote')+'）','平日、家に誰もいない時間: '+((isSolo()&&get('away')==='ほとんど誰かが家にいる')?'ほとんど家にいる（一人暮らし）':get('away')),
       'いま一緒に暮らしている動物: '+get('pets')+'（補足: '+t('petsNote')+'）','泊まりがけの外出: '+get('trip'),
       '動物を飼った経験: '+get('exp')+(get('exp')!=='ない'?'（飼っていた動物: '+get('expAnimal')+'）':''),
       '家族の動物アレルギー: '+get('allergy'),'これからの予定: '+get('future'),'相談したいこと: '+t('free')].join('\n');
@@ -364,6 +367,7 @@ footer{margin-top:44px;font-size:12px;color:var(--muted);border-top:1px dashed v
     +'- MIX（ミックス犬）の大きさは、相談者が選んだ大きさを目安として扱い、成犬になったときの大きさは、親犬の情報がなければ分からないものとして書く。\n'
     +'- 年代が10代で、文面などから相談者が子どもだと分かるときは、やさしい言葉で短めに書き、おうちの人にも読んでもらうよう添える。親が飼い主になる形で考える（07 P3）。\n'
     +'- 相談者を「あなた」と呼ばない。主語を省くか、「ご自身」と書く。\n- 「組み立てる」「〜しておくと無理がありません」のような、ぼんやりした言い方をしない。何をするかを具体的に書く（例: 毎日の散歩はご自身が中心になり、体調の悪い日や雨の日はご家族に代わってもらえるように決めておくと続けやすいです）。\n'
+    +'- 寿命の長い動物（犬、猫、オカメインコなど）で、相談者が60代以上のときは、迎えると相談者が何歳ごろまで一緒に暮らすことになるかを一言書く（07 P5）。不安をあおらず、もしものときの備え（頼める人、預け先）の話につなげる。\n'
     +'- 寿命は07 P5の目安を使う。大型犬は「12歳ぐらい」と書く。14〜15歳は例外的なので、ふつうは書かない。年齢を心配している相談者に「長くてもここまで」と伝えるときだけ使う。\n'
     +'- 品種の欄の「まだ決めていない」は、候補が絞れていないので一緒に考えたいという意味。「その他」は、候補はあるが一覧にないという意味（書かれた種類を読む）。\n'
     +'- 最後は、相談者に返事を求める問いかけ（「教えてください」など）で終わらず、次にできること（会いに行く、確かめておくこと）を示して終える。この画面には、アドバイスのあとに返事を書く場所がない。\n'
