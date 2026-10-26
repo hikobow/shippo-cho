@@ -472,7 +472,7 @@ footer{margin-top:44px;font-size:13px;color:var(--muted);border-top:1px dashed v
   };
   async function getPicks(answer){
     var sample=await samplePromise; if(!sample) return [];
-    try{ var r=await sample.json('次のアドバイスの中で、相談者に「候補として」勧めている動物や品種を、勧めている順に最大4つ挙げてください。外した、勧めないとしたものは入れない。noteは、そのアドバイスに書かれた特徴を15字以内で、傾向と分かる言い方で（例: 「穏やかな子が多い」。書かれていないことは書かない）。JSONだけで答える: {"picks":[{"species":"犬|猫|小鳥|ハムスター|モルモット|その他","name":"品種名または動物名","note":"…"}]}\n\n# アドバイス\n'+answer,{modelTier:'quick',cache:false});
+    try{ var r=await sample.json('次のアドバイスの中で、相談者に「候補として」勧めている動物や品種を、勧めている順に最大4つ挙げてください。外した、勧めないとしたものは入れない。保護犬・保護猫（保護施設や譲渡会から迎える子）を勧めているときは、nameに「保護猫」「保護犬」と書く。noteは、そのアドバイスに書かれた特徴を15字以内で、傾向と分かる言い方で（例: 「穏やかな子が多い」。書かれていないことは書かない）。JSONだけで答える: {"picks":[{"species":"犬|猫|小鳥|ハムスター|モルモット|その他","name":"品種名または動物名","note":"…"}]}\n\n# アドバイス\n'+answer,{modelTier:'quick',cache:false});
       return (r&&Array.isArray(r.picks)?r.picks:[]).filter(function(x){return x&&x.name;}).slice(0,4); }catch(e){ return []; } }
   // 「残す・共有する」のボタンを出すかどうか（ユキさん、2026-10-21）。
   // 試作・改変のとき: true（出す）。外に出すとき: false（出さない）。
@@ -494,14 +494,16 @@ footer{margin-top:44px;font-size:13px;color:var(--muted);border-top:1px dashed v
     document.getElementById('sdMsg').textContent=''; var sd=document.getElementById('shopDemo'); sd.hidden=false; sd.scrollTop=0; document.body.style.overflow='hidden'; }
   function closeShop(){ document.getElementById('shopDemo').hidden=true; document.body.style.overflow=''; window.scrollTo(0,shopBackY); }
   document.getElementById('sdClose').onclick=closeShop; document.getElementById('sdBack').onclick=closeShop;
-  function showPicks(list){ var box=document.getElementById('pickList'); box.innerHTML=''; var wrap=document.getElementById('shop');
+  function showPicks(list){ var box=document.getElementById('pickList'); box.innerHTML=''; var wrap=document.getElementById('shop'); var anyShop=false;
     if(!list||!list.length){ wrap.hidden=true; return; }
     list.forEach(function(x){ var d=document.createElement('div'); d.className='pick';
       var ic=document.createElement('div'); ic.innerHTML=ICON[x.species]||ICON['その他']; d.append(ic.firstChild);
       var b=document.createElement('b'); b.textContent=String(x.name); var sp=document.createElement('span'); sp.textContent=String(x.note||'');
-      var bt=document.createElement('a'); bt.className='btn ghost shopLink'; bt.href=SHOP_URL; bt.target='_blank'; bt.rel='noopener'; bt.textContent='お店で見る';
+      // 保護犬・保護猫には、お店の案内を出さない（ユキさん、2026-10-26）
+      var rescue=/保護|譲渡|里親/.test(String(x.name)+String(x.note||''));
+      var bt=document.createElement('a'); bt.className='btn ghost shopLink'; bt.href=SHOP_URL; bt.target='_blank'; bt.rel='noopener'; bt.textContent='お店で見る'; if(rescue){ bt=document.createElement('span'); bt.hidden=true; } else anyShop=true;
       d.append(b,sp,bt); box.append(d); });
-    document.getElementById('shopNote').hidden=true; wrap.hidden=false; }
+    document.getElementById('shopNote').hidden=true; var h=wrap.querySelector('.pickHint'); if(h) h.hidden=!anyShop; wrap.hidden=false; }
   var current=null;
   function showCtx(rec){ var d=document.getElementById('ctx'); if(!rec||!rec.profile){ d.hidden=true; return; } document.getElementById('ctxBody').textContent='【相談票】\n'+rec.profile+(rec.followup?'\n\n【追加の質問と答え】\n'+rec.followup:''); d.open=false; d.hidden=false; }
   function afterDone(rec){ current=rec; showCtx(rec); document.getElementById('after').hidden=false; document.getElementById('copyBtn').hidden=false; document.getElementById('copyAllBtn').hidden=false; document.getElementById('afterMsg').textContent='';
