@@ -122,7 +122,8 @@ footer{margin-top:44px;font-size:13px;color:var(--muted);border-top:1px dashed v
   <div class="brand"><svg viewBox="0 0 48 48" aria-hidden="true"><circle cx="20" cy="27" r="15" fill="var(--accent-soft)"/><path d="M33 33c6-1 10-6 9-12-1-4-5-5-7-2" fill="none" stroke="var(--coral)" stroke-width="3.4" stroke-linecap="round"/><path d="M8 16l3-9 7 6M32 16l-3-9-7 6" fill="var(--accent-soft)"/><circle cx="15" cy="26" r="2" fill="var(--ink)"/><circle cx="25" cy="26" r="2" fill="var(--ink)"/><path d="M18 31q2 2 4 0" stroke="var(--ink)" stroke-width="1.6" fill="none" stroke-linecap="round"/><circle cx="12" cy="30" r="2.2" fill="var(--coral)" opacity=".45"/><circle cx="28" cy="30" r="2.2" fill="var(--coral)" opacity=".45"/></svg>しっぽ帳</div>
   <span class="chip">試作版</span>
 </header>
-<p class="lead">迎えたい動物と、いまの暮らしを教えてください。必要なら、こちらからいくつか確認の質問をします。そのうえで、獣医師の経験をもとにした考え方で、あなたの暮らしに合う迎え方をアドバイスします。</p>
+<p class="lead"><b>しっぽ帳は、これから動物を家族に迎えたい方のためのアドバイザーです。どんな動物なら、いまの暮らしの中で無理なく暮らしていけるかを、一緒に考えます。</b></p>
+<p class="lead">迎えたい動物と、いまの暮らしを教えてください。こちらからいくつか確認の質問をします。そのうえで、獣医師の経験をもとにした考え方で、あなたの暮らしに合う迎え方をお伝えします。</p>
 
 <div class="note draft" id="draftNote" hidden><span id="draftMsg">前回の相談が途中で残っています。</span><button type="button" class="btn ghost" id="draftGo">続きから</button><button type="button" class="btn ghost" id="draftNew" style="margin-left:0">新しく始める</button></div>
 
@@ -143,8 +144,6 @@ footer{margin-top:44px;font-size:13px;color:var(--muted);border-top:1px dashed v
   <div class="group"><div class="gh"><span class="step">2</span>あなたのこと</div>
   <fieldset><legend>あなたの年代</legend><div class="opts" data-name="age" data-type="radio">
     <span>10代</span><span>20代</span><span>30代</span><span>40代</span><span>50代</span><span>60代</span><span>70代以上</span></div></fieldset>
-  <fieldset><legend>あなたの性別<small>答えなくても大丈夫です</small></legend><div class="opts" data-name="sex" data-type="radio">
-    <span>女性</span><span>男性</span><span>答えたくない</span></div></fieldset>
   <fieldset><legend>一緒に暮らす人<small>複数選べます</small></legend><div class="opts" data-name="family" data-type="checkbox">
     <span>一人暮らし</span><span>配偶者・パートナー</span><span>子ども</span><span>親</span><span>その他</span></div>
     <input type="text" id="familyNote" placeholder="子どもの年齢など（例: 中学生の娘1人）">
@@ -300,9 +299,9 @@ footer{margin-top:44px;font-size:13px;color:var(--muted);border-top:1px dashed v
   document.querySelectorAll('input[name="family"]').forEach(function(i){ i.addEventListener('change',dayLabel); });
   document.querySelectorAll('input[name="dogSize"]').forEach(function(i){ i.addEventListener('change',function(){ breedText.value=''; renderBreeds('犬',''); }); });
   document.querySelectorAll('input[name="exp"]').forEach(function(i){ i.addEventListener('change',function(){ document.getElementById('expWrap').hidden=(i.value==='ない'); }); });
-  var EXAMPLE={animal:'犬',dogSize:'小型犬',breedPick:'まだ決めていない',wish:'できればこの動物がいい',age:'40代',sex:'女性',family:['配偶者・パートナー','子ども'],home:'マンション',daytime:['外で仕事・学校','パート・時短勤務'],away:'6時間以内',pets:'いない',trip:'年に1〜2回',exp:'ない',allergy:'ない',future:['子どもの独立'],
+  var EXAMPLE={animal:'犬',dogSize:'小型犬',breedPick:'まだ決めていない',wish:'できればこの動物がいい',age:'40代',family:['配偶者・パートナー','子ども'],home:'マンション',daytime:['外で仕事・学校','パート・時短勤務'],away:'6時間以内',pets:'いない',trip:'年に1〜2回',exp:'ない',allergy:'ない',future:['子どもの独立'],
     familyNote:'中学1年の娘', rule:'小型犬1匹まで', daytimeNote:'妻は週3日のパート', free:'本当は大型犬に憧れていますが、マンションの決まりで小型犬しか飼えません。家族で散歩やお出かけを楽しみたいです。どんな犬が合いますか？'};
-  var FIELDS=['animal','dogSize','hamKind','wish','age','sex','family','home','daytime','away','pets','trip','exp','expAnimal','allergy','future'];
+  var FIELDS=['animal','dogSize','hamKind','wish','age','family','home','daytime','away','pets','trip','exp','expAnimal','allergy','future'];
   function setVal(name,v){ document.querySelectorAll('input[name="'+name+'"]').forEach(function(i){ i.checked = Array.isArray(v)? v.indexOf(i.value)>=0 : i.value===v; }); }
   function fill(o){ FIELDS.forEach(function(k){setVal(k,o[k]||'');});
     ['breed','familyNote','rule','daytimeNote','petsNote','free'].forEach(function(id){ document.getElementById(id).value=o[id]||''; });
@@ -348,7 +347,7 @@ footer{margin-top:44px;font-size:13px;color:var(--muted);border-top:1px dashed v
   function profile(){
     var t=function(id){var v=document.getElementById(id).value.trim();return v||'（記入なし）';};
     var bp=(get('animal')==='犬'&&get('dogSize')==='まだ決めていない')?'まだ決めていない':get('breedPick'); if(bp==='ハムスター'&&get('hamKind')!=='（未回答）') bp='ハムスター（'+get('hamKind')+'）'; var breed=(bp==='その他'||get('animal')==='その他の動物')? t('breed') : bp;
-    return ['迎えたい動物: '+get('animal')+'（'+(get('animal')==='犬'&&get('dogSize')!=='（未回答）'?'大きさ: '+get('dogSize')+'、':'')+'種類: '+breed+'）','その動物への思い: '+get('wish'),'相談者の年代: '+get('age'),'相談者の性別: '+(get('sex')==='（未回答）'?'答えなし':get('sex')),
+    return ['迎えたい動物: '+get('animal')+'（'+(get('animal')==='犬'&&get('dogSize')!=='（未回答）'?'大きさ: '+get('dogSize')+'、':'')+'種類: '+breed+'）','その動物への思い: '+get('wish'),'相談者の年代: '+get('age'),
       '一緒に暮らす人: '+get('family')+'（補足: '+t('familyNote')+'）','住まい: '+get('home')+'（飼える動物の決まり: '+t('rule')+'）',
       '平日の日中の過ごし方: '+get('daytime')+'（補足: '+t('daytimeNote')+'）','平日、家に誰もいない時間: '+((isSolo()&&get('away')==='ほとんど誰かが家にいる')?'ほとんど家にいる（一人暮らし）':get('away')),
       'いま一緒に暮らしている動物: '+get('pets')+'（補足: '+t('petsNote')+'）','泊まりがけの外出: '+get('trip'),
